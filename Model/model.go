@@ -2,7 +2,7 @@ package model
 
 type CarType struct {
 	CarTypeID          int    `json:"cartypeid"`
-	CarGUID            string `json:"name"`
+	CarGUID            string `json:"cartypeguid"`
 	CarTypeName        string `json:"cartypeName"`
 	CarTypeDesctiption string `json:"cartypedesctiption"`
 	CarTypeInactive    int    `json:"cartypeinactive"`

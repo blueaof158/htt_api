@@ -47,6 +47,80 @@ func GetCarType(c *fiber.Ctx) (model.CarType, error, string) {
 	return result, nil, "success"
 }
 
+func AddCarType(c *fiber.Ctx) (model.CarType, error, string) {
+	cartype := new(model.CarType)
+	c.BodyParser(cartype)
+	stmt, err := db.Prepare("INSERT INTO CarType (CarGUID,CarTypeName,CarTypeDesctiption,CarTypeInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?, ?, ?, ?, User(), NOW(), User(), NOW())")
+	if err != nil {
+		return model.CarType{}, err, err.Error()
+	}
+	result, err := stmt.Exec(
+		cartype.CarGUID,
+		cartype.CarTypeName,
+		cartype.CarTypeDesctiption,
+		cartype.CarTypeInactive,
+	)
+	if err != nil {
+		return model.CarType{}, err, err.Error()
+	}
+	lastInsertID, err := result.LastInsertId()
+	if err != nil {
+		return model.CarType{}, err, "can't get id"
+	}
+	cartype.CarTypeID = int(lastInsertID)
+	var r model.CarType
+	r.CarGUID = cartype.CarGUID
+	r.CarTypeName = cartype.CarTypeName
+	r.CarTypeDesctiption = cartype.CarTypeDesctiption
+	r.CarTypeInactive = cartype.CarTypeInactive
+	return r, nil, "success"
+}
+
+func UpdateCarType(c *fiber.Ctx) (model.CarType, error, string) {
+	cartypeid, err := strconv.Atoi(c.Params("cartypeid"))
+	cartype := new(model.CarType)
+	c.BodyParser(cartype)
+	stmt, err := db.Prepare("UPDATE CarType SET CarTypeName=?, CarTypeDesctiption=?, CarTypeInactive=?, UpdateBy=User(), UpdateDate=NOW() WHERE CarTypeID=?")
+	if err != nil {
+		return model.CarType{}, err, err.Error()
+	}
+	_, err = stmt.Exec(
+		cartype.CarTypeName,
+		cartype.CarTypeDesctiption,
+		cartype.CarTypeInactive,
+		cartypeid,
+	)
+	if err != nil {
+		return model.CarType{}, err, err.Error()
+	}
+
+	var r model.CarType
+	r.CarTypeID = cartypeid
+	r.CarGUID = cartype.CarGUID
+	r.CarTypeName = cartype.CarTypeName
+	r.CarTypeDesctiption = cartype.CarTypeDesctiption
+	r.CarTypeInactive = cartype.CarTypeInactive
+	return r, nil, "success"
+}
+
+func DeleteCarType(c *fiber.Ctx) (model.CarType, error, string) {
+	cartypeid, err := strconv.Atoi(c.Params("cartypeid"))
+	cartype := new(model.CarType)
+	c.BodyParser(cartype)
+	stmt, err := db.Prepare("DELETE FROM  CarType WHERE CarTypeID=?")
+	if err != nil {
+		return model.CarType{}, err, err.Error()
+	}
+	_, err = stmt.Exec(
+		cartypeid,
+	)
+	if err != nil {
+		return model.CarType{}, err, err.Error()
+	}
+
+	return model.CarType{}, nil, "success"
+}
+
 func GetAwards() ([]model.Award, error, string) {
 	var awards []model.Award
 	query := "SELECT AwardID,AwardGUID,AwardName,AwardDescription,AwardInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Award;"

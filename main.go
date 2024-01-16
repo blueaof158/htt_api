@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gofiber/fiber/v2"
@@ -39,9 +40,9 @@ func main() {
 
 	app.Get("/api/getcartypes", controller.GetCarTypes)
 	app.Get("/api/getcartype/:cartypeid", controller.GetCarType)
-	// app.Post("/api/addcartype/:cartypeid", controller.GetCarType)
-	// app.Put("/api/updatecartype/:cartypeid", controller.UpdateCarType)
-	// app.Delete("/api/deletecartype/:cartypeid", controller.DeleteCarType)
+	app.Post("/api/addcartype", controller.AddCarType)
+	app.Put("/api/updatecartype/:cartypeid", controller.UpdateCarType)
+	app.Delete("/api/deletecartype/:cartypeid", controller.DeleteCarType)
 
 	app.Get("/api/getawards", controller.GetAwards)
 	app.Get("/api/getaward/:awardid", controller.GetAward)
@@ -60,9 +61,9 @@ func main() {
 	// app.Get("/api/contents", controller.Getcontents)
 	// app.Get("/api/content/:contentid", controller.Getcontent)
 	// app.Post("/api/addcontent/:contentid", controller.GetcontentType)
-	// app.Put("/api/updatecontent/:contenttypeid", controller.UpdatecontentType)
-	// app.Delete("/api/deletecontent/:contenttypeid", controller.DeletecontentType)
-	// app.Get("/api/updateacontent/:awardid", controller.GetAward)
+	// app.Put("/api/updatecontent/:contentid", controller.UpdatecontentType)
+	// app.Delete("/api/deletecontent/:contentid", controller.DeletecontentType)
+	// app.Get("/api/updateacontent/:contentid", controller.GetAward)
 
 	app.Listen(":8080")
 
@@ -78,6 +79,7 @@ func getEnv(c *fiber.Ctx) error {
 		"name": name,
 		"db":   addressdb,
 		"db2":  addressdba,
+		"aa":   time.Now().Format("2006-01-02 15:04:05"),
 	})
 }
 
