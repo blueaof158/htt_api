@@ -136,9 +136,3 @@ type Login struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
-
-type ReturnData struct {
-	Data   any    `json:"data"`
-	Msg    string `json:"msg"`
-	Status int    `json:"status"`
-}
