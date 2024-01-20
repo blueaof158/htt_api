@@ -59,7 +59,7 @@ func main() {
 
 	app.Get("/api/contents", controller.GetContents)
 	app.Get("/api/content/:contentid", controller.GetContent)
-	// app.Post("/api/addcontent/:contentid", controller.AddContent)
+	app.Post("/api/addcontent/:contentid", controller.AddContent)
 	// app.Put("/api/updatecontent/:contentid", controller.UpdatecontentType)
 	// app.Delete("/api/deletecontent/:contentid", controller.DeletecontentType)
 	// app.Get("/api/updateacontent/:contentid", controller.GetAward)

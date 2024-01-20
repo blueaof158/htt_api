@@ -425,39 +425,40 @@ func AddContent(c *fiber.Ctx) (model.Content, error, string) {
 	return r, nil, "success"
 }
 
-// func UpdateCar(c *fiber.Ctx) (model.Car, error, string) {
-// 	carid, err := strconv.Atoi(c.Params("carid"))
-// 	car := new(model.Car)
-// 	c.BodyParser(car)
+func UpdateContent(c *fiber.Ctx) (model.Content, error, string) {
+	contentid, err := strconv.Atoi(c.Params("contentid"))
+	content := new(model.Content)
+	c.BodyParser(content)
 
-// 	data, err, _ := GetCar(c)
-// 	if data == (model.Car{}) {
-// 		return model.Car{}, err, err.Error()
-// 	}
-// 	stmt, err := db.Prepare("UPDATE Car SET CarName=?, CarDesctiption=?, CarTypeID=?,CarInactive=?, UpdateBy=User(), UpdateDate=NOW() WHERE CarID=?")
-// 	if err != nil {
-// 		return model.Car{}, err, err.Error()
-// 	}
-// 	_, err = stmt.Exec(
-// 		car.CarName,
-// 		car.CarDesctiption,
-// 		car.CarTypeID,
-// 		car.CarInactive,
-// 		carid,
-// 	)
-// 	if err != nil {
-// 		return model.Car{}, err, err.Error()
-// 	}
+	data, err, _ := GetContent(c)
+	if data == (model.Content{}) {
+		return model.Content{}, err, err.Error()
+	}
+	stmt, err := db.Prepare("UPDATE Content SET ContentTitle=?, HyphenationTitle=?, ContentText=?,Content=?,ContentInactive=?, UpdateBy=User(), UpdateDate=NOW() WHERE ContentID=?")
+	if err != nil {
+		return model.Content{}, err, err.Error()
+	}
+	_, err = stmt.Exec(
+		content.ContentTitle,
+		content.HyphenationTitle,
+		content.ContentText,
+		content.Content,
+		content.ContentInactive,
+		contentid,
+	)
+	if err != nil {
+		return model.Content{}, err, err.Error()
+	}
 
-// 	var r model.Car
-// 	r.CarID = carid
-// 	r.CarGUID = car.CarGUID
-// 	r.CarName = car.CarName
-// 	r.CarDesctiption = car.CarDesctiption
-// 	r.CarTypeID = car.CarTypeID
-// 	r.CarInactive = car.CarInactive
-// 	return r, nil, "success"
-// }
+	var r model.Content
+	r.ContentID = contentid
+	r.ContentTitle = content.ContentTitle
+	r.HyphenationTitle = content.HyphenationTitle
+	r.ContentText = content.ContentText
+	r.Content = content.Content
+	r.ContentInactive = content.ContentInactive
+	return r, nil, "success"
+}
 
 // func DeleteCar(c *fiber.Ctx) (model.Car, error, string) {
 // 	carid, err := strconv.Atoi(c.Params("carid"))

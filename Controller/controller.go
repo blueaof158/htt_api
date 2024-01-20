@@ -272,20 +272,20 @@ func GetContent(c *fiber.Ctx) error {
 	})
 }
 
-// func AddContent(c *fiber.Ctx) error {
-// 	data, err, msg := services.AddContent(c)
-// 	if err != nil {
-// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-// 			"status":  fiber.StatusBadRequest,
-// 			"message": err.Error(),
-// 		})
-// 	}
-// 	return c.JSON(fiber.Map{
-// 		"data":    data,
-// 		"status":  fiber.StatusOK,
-// 		"message": msg,
-// 	})
-// }
+func AddContent(c *fiber.Ctx) error {
+	data, err, msg := services.AddContent(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
 
 // func UpdateContent(c *fiber.Ctx) error {
 // 	data, err, msg := services.UpdateContent(c)
