@@ -287,6 +287,84 @@ func AddContent(c *fiber.Ctx) error {
 	})
 }
 
+func UpdateContent(c *fiber.Ctx) error {
+	data, err, msg := services.UpdateContent(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
+
+func DeleteContent(c *fiber.Ctx) error {
+	data, err, msg := services.DeleteContent(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
+
+// ## Content
+
+// ## Executives
+// func GetContents(c *fiber.Ctx) error {
+// 	data, err, msg := services.GetContents()
+// 	if err != nil {
+// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+// 			"status":  fiber.StatusBadRequest,
+// 			"message": err.Error(),
+// 		})
+// 	}
+// 	return c.JSON(fiber.Map{
+// 		"data":    data,
+// 		"status":  fiber.StatusOK,
+// 		"message": msg,
+// 	})
+// }
+
+// func GetContent(c *fiber.Ctx) error {
+// 	data, err, msg := services.GetContent(c)
+// 	if err != nil {
+// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+// 			"status":  fiber.StatusBadRequest,
+// 			"message": err.Error(),
+// 		})
+// 	}
+// 	return c.JSON(fiber.Map{
+// 		"data":    data,
+// 		"status":  fiber.StatusOK,
+// 		"message": msg,
+// 	})
+// }
+
+// func AddContent(c *fiber.Ctx) error {
+// 	data, err, msg := services.AddContent(c)
+// 	if err != nil {
+// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+// 			"status":  fiber.StatusBadRequest,
+// 			"message": err.Error(),
+// 		})
+// 	}
+// 	return c.JSON(fiber.Map{
+// 		"data":    data,
+// 		"status":  fiber.StatusOK,
+// 		"message": msg,
+// 	})
+// }
+
 // func UpdateContent(c *fiber.Ctx) error {
 // 	data, err, msg := services.UpdateContent(c)
 // 	if err != nil {
@@ -316,5 +394,4 @@ func AddContent(c *fiber.Ctx) error {
 // 		"message": msg,
 // 	})
 // }
-
-// ## Content
+// ## Executives

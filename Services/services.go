@@ -460,21 +460,21 @@ func UpdateContent(c *fiber.Ctx) (model.Content, error, string) {
 	return r, nil, "success"
 }
 
-// func DeleteCar(c *fiber.Ctx) (model.Car, error, string) {
-// 	carid, err := strconv.Atoi(c.Params("carid"))
-// 	car := new(model.Car)
-// 	c.BodyParser(car)
-// 	stmt, err := db.Prepare("DELETE FROM Car WHERE CarID=?")
-// 	if err != nil {
-// 		return model.Car{}, err, err.Error()
-// 	}
-// 	_, err = stmt.Exec(
-// 		carid,
-// 	)
-// 	if err != nil {
-// 		return model.Car{}, err, err.Error()
-// 	}
-// 	return model.Car{}, nil, "success"
-// }
+func DeleteContent(c *fiber.Ctx) (model.Content, error, string) {
+	contentid, err := strconv.Atoi(c.Params("contentid"))
+	content := new(model.Content)
+	c.BodyParser(content)
+	stmt, err := db.Prepare("DELETE FROM Content WHERE ContentID=?")
+	if err != nil {
+		return model.Content{}, err, err.Error()
+	}
+	_, err = stmt.Exec(
+		contentid,
+	)
+	if err != nil {
+		return model.Content{}, err, err.Error()
+	}
+	return model.Content{}, nil, "success"
+}
 
 // ## Content
