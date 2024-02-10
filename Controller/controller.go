@@ -320,20 +320,20 @@ func DeleteContent(c *fiber.Ctx) error {
 // ## Content
 
 // ## Executives
-// func GetContents(c *fiber.Ctx) error {
-// 	data, err, msg := services.GetContents()
-// 	if err != nil {
-// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-// 			"status":  fiber.StatusBadRequest,
-// 			"message": err.Error(),
-// 		})
-// 	}
-// 	return c.JSON(fiber.Map{
-// 		"data":    data,
-// 		"status":  fiber.StatusOK,
-// 		"message": msg,
-// 	})
-// }
+func GetExecutives(c *fiber.Ctx) error {
+	data, err, msg := services.GetExecutives()
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
 
 // func GetContent(c *fiber.Ctx) error {
 // 	data, err, msg := services.GetContent(c)

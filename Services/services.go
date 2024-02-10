@@ -478,3 +478,122 @@ func DeleteContent(c *fiber.Ctx) (model.Content, error, string) {
 }
 
 // ## Content
+
+// ## Executives
+
+func GetExecutives() ([]model.Executives, error, string) {
+	var contents []model.Executives
+	query := "SELECT ExecutivesID,ExecutivesGUID,ExecutivesFirstName,ExecutivesLastName,ExecutivesPosition,ExecutivesBio,ExecutivesInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Executives;"
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err, err.Error()
+	}
+	for rows.Next() {
+		var content model.Executives
+		err = rows.Scan(&content.ExecutivesID, &content.ExecutivesGUID, &content.ExecutivesFirstName, &content.ExecutivesLastName, &content.ExecutivesPosition, &content.ExecutivesBio, &content.ExecutivesInactive, &content.CreateBy, &content.CreateDate, &content.UpdateBy, &content.UpdateDate)
+		if err != nil {
+			return nil, err, err.Error()
+		}
+		contents = append(contents, content)
+	}
+	return contents, nil, "success"
+}
+
+func GetExecutive(c *fiber.Ctx) (model.Executives, error, string) {
+	id, err := strconv.Atoi(c.Params("carid"))
+	var content model.Executives
+	err = db.QueryRow("SELECT ExecutivesID,ExecutivesGUID,ExecutivesFirstName,ExecutivesLastName,ExecutivesPosition,ExecutivesBio,ExecutivesInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Executives WHERE ExecutivesID = ?;", id).Scan(&content.ExecutivesID, &content.ExecutivesGUID, &content.ExecutivesFirstName, &content.ExecutivesLastName, &content.ExecutivesPosition, &content.ExecutivesBio, &content.ExecutivesInactive, &content.CreateBy, &content.CreateDate, &content.UpdateBy, &content.UpdateDate)
+	if err != nil {
+		return model.Executives{}, err, err.Error()
+	}
+	return content, nil, "success"
+}
+
+func AddContent(c *fiber.Ctx) (model.Content, error, string) {
+	content := new(model.Content)
+	if err = c.BodyParser(content); err != nil {
+		return model.Content{}, err, err.Error()
+	}
+	stmt, err := db.Prepare("INSERT INTO Content (ContentGUID,ContentTitle,HyphenationTitle,ContentText,Content,ContentInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,?,?,?,User(), NOW(), User(), NOW())")
+	if err != nil {
+		return model.Content{}, err, err.Error()
+	}
+	result, err := stmt.Exec(
+		content.ContentGUID,
+		content.ContentTitle,
+		content.HyphenationTitle,
+		content.ContentText,
+		content.Content,
+		content.ContentInactive,
+	)
+	if err != nil {
+		return model.Content{}, err, err.Error()
+	}
+	lastInsertID, err := result.LastInsertId()
+	if err != nil {
+		return model.Content{}, err, "can't get id"
+	}
+	var r model.Content
+	r.ContentID = int(lastInsertID)
+	r.ContentGUID = content.ContentGUID
+	r.ContentTitle = content.ContentTitle
+	r.HyphenationTitle = content.HyphenationTitle
+	r.ContentText = content.ContentText
+	r.Content = content.Content
+	r.ContentInactive = content.ContentInactive
+	return r, nil, "success"
+}
+
+func UpdateContent(c *fiber.Ctx) (model.Content, error, string) {
+	contentid, err := strconv.Atoi(c.Params("contentid"))
+	content := new(model.Content)
+	c.BodyParser(content)
+
+	data, err, _ := GetContent(c)
+	if data == (model.Content{}) {
+		return model.Content{}, err, err.Error()
+	}
+	stmt, err := db.Prepare("UPDATE Content SET ContentTitle=?, HyphenationTitle=?, ContentText=?,Content=?,ContentInactive=?, UpdateBy=User(), UpdateDate=NOW() WHERE ContentID=?")
+	if err != nil {
+		return model.Content{}, err, err.Error()
+	}
+	_, err = stmt.Exec(
+		content.ContentTitle,
+		content.HyphenationTitle,
+		content.ContentText,
+		content.Content,
+		content.ContentInactive,
+		contentid,
+	)
+	if err != nil {
+		return model.Content{}, err, err.Error()
+	}
+
+	var r model.Content
+	r.ContentID = contentid
+	r.ContentTitle = content.ContentTitle
+	r.HyphenationTitle = content.HyphenationTitle
+	r.ContentText = content.ContentText
+	r.Content = content.Content
+	r.ContentInactive = content.ContentInactive
+	return r, nil, "success"
+}
+
+func DeleteContent(c *fiber.Ctx) (model.Content, error, string) {
+	contentid, err := strconv.Atoi(c.Params("contentid"))
+	content := new(model.Content)
+	c.BodyParser(content)
+	stmt, err := db.Prepare("DELETE FROM Content WHERE ContentID=?")
+	if err != nil {
+		return model.Content{}, err, err.Error()
+	}
+	_, err = stmt.Exec(
+		contentid,
+	)
+	if err != nil {
+		return model.Content{}, err, err.Error()
+	}
+	return model.Content{}, nil, "success"
+}
+
+// ## Executives
