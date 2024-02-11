@@ -22,13 +22,13 @@ func main() {
 // ## CarType
 func GetCarTypes() ([]model.CarType, error, string) {
 	var cartypes []model.CarType
-	rows, err := db.Query("SELECT CarTypeID,CarGUID,CarTypeName,CarTypeDesctiption,CarTypeInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM CarType;")
+	rows, err := db.Query("SELECT CarTypeID,CarTypeName,CarTypeDesctiption,CarTypeInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM CarType;")
 	if err != nil {
 		return nil, err, err.Error()
 	}
 	for rows.Next() {
 		var cartype model.CarType
-		err = rows.Scan(&cartype.CarTypeID, &cartype.CarGUID, &cartype.CarTypeName, &cartype.CarTypeDesctiption, &cartype.CarTypeInactive, &cartype.CreateBy, &cartype.CreateDate, &cartype.UpdateBy, &cartype.UpdateDate)
+		err = rows.Scan(&cartype.CarTypeID, &cartype.CarTypeName, &cartype.CarTypeDesctiption, &cartype.CarTypeInactive, &cartype.CreateBy, &cartype.CreateDate, &cartype.UpdateBy, &cartype.UpdateDate)
 		if err != nil {
 			return nil, err, err.Error()
 		}
@@ -43,7 +43,7 @@ func GetCarType(c *fiber.Ctx) (model.CarType, error, string) {
 		return model.CarType{}, err, err.Error()
 	}
 	var result model.CarType
-	err = db.QueryRow("SELECT CarTypeID,CarGUID,CarTypeName,CarTypeDesctiption,CarTypeInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM CarType WHERE CarTypeID = ?;", id).Scan(&result.CarTypeID, &result.CarGUID, &result.CarTypeName, &result.CarTypeDesctiption, &result.CarTypeInactive, &result.CreateBy, &result.CreateDate, &result.UpdateBy, &result.UpdateDate)
+	err = db.QueryRow("SELECT CarTypeID,CarTypeName,CarTypeDesctiption,CarTypeInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM CarType WHERE CarTypeID = ?;", id).Scan(&result.CarTypeID, &result.CarTypeName, &result.CarTypeDesctiption, &result.CarTypeInactive, &result.CreateBy, &result.CreateDate, &result.UpdateBy, &result.UpdateDate)
 	if err != nil {
 		return model.CarType{}, err, err.Error()
 	}
@@ -55,12 +55,11 @@ func AddCarType(c *fiber.Ctx) (model.CarType, error, string) {
 	if err = c.BodyParser(cartype); err != nil {
 		return model.CarType{}, err, err.Error()
 	}
-	stmt, err := db.Prepare("INSERT INTO CarType (CarGUID,CarTypeName,CarTypeDesctiption,CarTypeInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?, ?, ?, ?, User(), NOW(), User(), NOW())")
+	stmt, err := db.Prepare("INSERT INTO CarType (CarTypeName,CarTypeDesctiption,CarTypeInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?, ?, ?, ?, User(), NOW(), User(), NOW())")
 	if err != nil {
 		return model.CarType{}, err, err.Error()
 	}
 	result, err := stmt.Exec(
-		cartype.CarGUID,
 		cartype.CarTypeName,
 		cartype.CarTypeDesctiption,
 		cartype.CarTypeInactive,
@@ -74,7 +73,6 @@ func AddCarType(c *fiber.Ctx) (model.CarType, error, string) {
 	}
 	var r model.CarType
 	r.CarTypeID = int(lastInsertID)
-	r.CarGUID = cartype.CarGUID
 	r.CarTypeName = cartype.CarTypeName
 	r.CarTypeDesctiption = cartype.CarTypeDesctiption
 	r.CarTypeInactive = cartype.CarTypeInactive
@@ -106,7 +104,6 @@ func UpdateCarType(c *fiber.Ctx) (model.CarType, error, string) {
 
 	var r model.CarType
 	r.CarTypeID = cartypeid
-	r.CarGUID = cartype.CarGUID
 	r.CarTypeName = cartype.CarTypeName
 	r.CarTypeDesctiption = cartype.CarTypeDesctiption
 	r.CarTypeInactive = cartype.CarTypeInactive
@@ -136,14 +133,14 @@ func DeleteCarType(c *fiber.Ctx) (model.CarType, error, string) {
 // ## Awards
 func GetAwards() ([]model.Award, error, string) {
 	var awards []model.Award
-	query := "SELECT AwardID,AwardGUID,AwardName,AwardDescription,AwardInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Award;"
+	query := "SELECT AwardID,AwardName,AwardDescription,AwardInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Award;"
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err, err.Error()
 	}
 	for rows.Next() {
 		var award model.Award
-		err = rows.Scan(&award.AwardID, &award.AwardGUID, &award.AwardName, &award.AwardDescription, &award.AwardInactive, &award.CreateBy, &award.CreateDate, &award.UpdateBy, &award.UpdateDate)
+		err = rows.Scan(&award.AwardID, &award.AwardName, &award.AwardDescription, &award.AwardInactive, &award.CreateBy, &award.CreateDate, &award.UpdateBy, &award.UpdateDate)
 		if err != nil {
 			return nil, err, err.Error()
 		}
@@ -155,7 +152,7 @@ func GetAwards() ([]model.Award, error, string) {
 func GetAward(c *fiber.Ctx) (model.Award, error, string) {
 	id, err := strconv.Atoi(c.Params("awardid"))
 	var award model.Award
-	err = db.QueryRow("SELECT AwardID,AwardGUID,AwardName,AwardDescription,AwardInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Award WHERE AwardID = ?;", id).Scan(&award.AwardID, &award.AwardGUID, &award.AwardName, &award.AwardDescription, &award.AwardInactive, &award.CreateBy, &award.CreateDate, &award.UpdateBy, &award.UpdateDate)
+	err = db.QueryRow("SELECT AwardID,AwardName,AwardDescription,AwardInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Award WHERE AwardID = ?;", id).Scan(&award.AwardID, &award.AwardName, &award.AwardDescription, &award.AwardInactive, &award.CreateBy, &award.CreateDate, &award.UpdateBy, &award.UpdateDate)
 
 	if err != nil {
 		return model.Award{}, err, err.Error()
@@ -169,12 +166,11 @@ func AddAward(c *fiber.Ctx) (model.Award, error, string) {
 	if err = c.BodyParser(award); err != nil {
 		return model.Award{}, err, err.Error()
 	}
-	stmt, err := db.Prepare("INSERT INTO Award (AwardGUID,AwardName,AwardDescription,AwardInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,?,User(), NOW(), User(), NOW())")
+	stmt, err := db.Prepare("INSERT INTO Award (AwardName,AwardDescription,AwardInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,?,User(), NOW(), User(), NOW())")
 	if err != nil {
 		return model.Award{}, err, err.Error()
 	}
 	result, err := stmt.Exec(
-		award.AwardGUID,
 		award.AwardName,
 		award.AwardDescription,
 		award.AwardInactive,
@@ -188,7 +184,6 @@ func AddAward(c *fiber.Ctx) (model.Award, error, string) {
 	}
 	var r model.Award
 	r.AwardID = int(lastInsertID)
-	r.AwardGUID = award.AwardGUID
 	r.AwardName = award.AwardName
 	r.AwardDescription = award.AwardDescription
 	r.AwardInactive = award.AwardInactive
@@ -220,7 +215,6 @@ func UpdateAward(c *fiber.Ctx) (model.Award, error, string) {
 
 	var r model.Award
 	r.AwardID = awardid
-	r.AwardGUID = award.AwardGUID
 	r.AwardName = award.AwardName
 	r.AwardDescription = award.AwardDescription
 	r.AwardInactive = award.AwardInactive
@@ -249,14 +243,14 @@ func DeleteAward(c *fiber.Ctx) (model.CarType, error, string) {
 // ## Car
 func GetCars() ([]model.Car, error, string) {
 	var cars []model.Car
-	query := "SELECT CarID,CarGUID,CarName,CarDesctiption,CarTypeID,CarInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Car;"
+	query := "SELECT CarID,CarName,CarDesctiption,CarTypeID,CarInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Car;"
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err, err.Error()
 	}
 	for rows.Next() {
 		var car model.Car
-		err = rows.Scan(&car.CarID, &car.CarGUID, &car.CarName, &car.CarDesctiption, &car.CarTypeID, &car.CarInactive, &car.CreateBy, &car.CreateDate, &car.UpdateBy, &car.UpdateDate)
+		err = rows.Scan(&car.CarID, &car.CarName, &car.CarDesctiption, &car.CarTypeID, &car.CarInactive, &car.CreateBy, &car.CreateDate, &car.UpdateBy, &car.UpdateDate)
 		if err != nil {
 			return nil, err, err.Error()
 		}
@@ -268,7 +262,7 @@ func GetCars() ([]model.Car, error, string) {
 func GetCar(c *fiber.Ctx) (model.Car, error, string) {
 	id, err := strconv.Atoi(c.Params("carid"))
 	var result model.Car
-	err = db.QueryRow("SELECT CarID,CarGUID,CarName,CarDesctiption,CarTypeID,CarInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Car CarID = ?;", id).Scan(&result.CarID, &result.CarGUID, &result.CarName, &result.CarDesctiption, &result.CarTypeID, &result.CarInactive, &result.CreateBy, &result.CreateDate, &result.UpdateBy, &result.UpdateDate)
+	err = db.QueryRow("SELECT CarID,CarName,CarDesctiption,CarTypeID,CarInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Car CarID = ?;", id).Scan(&result.CarID, &result.CarName, &result.CarDesctiption, &result.CarTypeID, &result.CarInactive, &result.CreateBy, &result.CreateDate, &result.UpdateBy, &result.UpdateDate)
 	if err != nil {
 		return model.Car{}, err, err.Error()
 	}
@@ -280,12 +274,11 @@ func AddCar(c *fiber.Ctx) (model.Car, error, string) {
 	if err = c.BodyParser(car); err != nil {
 		return model.Car{}, err, err.Error()
 	}
-	stmt, err := db.Prepare("INSERT INTO Car (CarGUID,CarName,CarDesctiption,CarTypeID,CarInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,?,?,User(), NOW(), User(), NOW())")
+	stmt, err := db.Prepare("INSERT INTO Car (CarName,CarDesctiption,CarTypeID,CarInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,?,?,User(), NOW(), User(), NOW())")
 	if err != nil {
 		return model.Car{}, err, err.Error()
 	}
 	result, err := stmt.Exec(
-		car.CarGUID,
 		car.CarName,
 		car.CarDesctiption,
 		car.CarInactive,
@@ -299,7 +292,6 @@ func AddCar(c *fiber.Ctx) (model.Car, error, string) {
 	}
 	var r model.Car
 	r.CarID = int(lastInsertID)
-	r.CarGUID = car.CarGUID
 	r.CarName = car.CarName
 	r.CarTypeID = car.CarTypeID
 	r.CarDesctiption = car.CarDesctiption
@@ -333,7 +325,6 @@ func UpdateCar(c *fiber.Ctx) (model.Car, error, string) {
 
 	var r model.Car
 	r.CarID = carid
-	r.CarGUID = car.CarGUID
 	r.CarName = car.CarName
 	r.CarDesctiption = car.CarDesctiption
 	r.CarTypeID = car.CarTypeID
@@ -364,14 +355,14 @@ func DeleteCar(c *fiber.Ctx) (model.Car, error, string) {
 
 func GetContents() ([]model.Content, error, string) {
 	var contents []model.Content
-	query := "SELECT ContentID,ContentGUID,ContentTitle,HyphenationTitle,ContentText,Content,ContentInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Content;"
+	query := "SELECT ContentID,ContentTitle,HyphenationTitle,ContentText,Content,ContentInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Content;"
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err, err.Error()
 	}
 	for rows.Next() {
 		var content model.Content
-		err = rows.Scan(&content.ContentID, &content.ContentGUID, &content.ContentTitle, &content.HyphenationTitle, &content.ContentText, &content.Content, &content.ContentInactive, &content.CreateBy, &content.CreateDate, &content.UpdateBy, &content.UpdateDate)
+		err = rows.Scan(&content.ContentID, &content.ContentTitle, &content.HyphenationTitle, &content.ContentText, &content.Content, &content.ContentInactive, &content.CreateBy, &content.CreateDate, &content.UpdateBy, &content.UpdateDate)
 		if err != nil {
 			return nil, err, err.Error()
 		}
@@ -383,7 +374,7 @@ func GetContents() ([]model.Content, error, string) {
 func GetContent(c *fiber.Ctx) (model.Content, error, string) {
 	id, err := strconv.Atoi(c.Params("carid"))
 	var content model.Content
-	err = db.QueryRow("SELECT ContentID,ContentGUID,ContentTitle,HyphenationTitle,ContentText,Content,ContentInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Content ContentID = ?;", id).Scan(&content.ContentID, &content.ContentGUID, &content.ContentTitle, &content.HyphenationTitle, &content.ContentText, &content.Content, &content.ContentInactive, &content.CreateBy, &content.CreateDate, &content.UpdateBy, &content.UpdateDate)
+	err = db.QueryRow("SELECT ContentID,ContentTitle,HyphenationTitle,ContentText,Content,ContentInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Content ContentID = ?;", id).Scan(&content.ContentID, &content.ContentTitle, &content.HyphenationTitle, &content.ContentText, &content.Content, &content.ContentInactive, &content.CreateBy, &content.CreateDate, &content.UpdateBy, &content.UpdateDate)
 	if err != nil {
 		return model.Content{}, err, err.Error()
 	}
@@ -395,12 +386,11 @@ func AddContent(c *fiber.Ctx) (model.Content, error, string) {
 	if err = c.BodyParser(content); err != nil {
 		return model.Content{}, err, err.Error()
 	}
-	stmt, err := db.Prepare("INSERT INTO Content (ContentGUID,ContentTitle,HyphenationTitle,ContentText,Content,ContentInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,?,?,?,User(), NOW(), User(), NOW())")
+	stmt, err := db.Prepare("INSERT INTO Content (ContentTitle,HyphenationTitle,ContentText,Content,ContentInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,?,?,?,User(), NOW(), User(), NOW())")
 	if err != nil {
 		return model.Content{}, err, err.Error()
 	}
 	result, err := stmt.Exec(
-		content.ContentGUID,
 		content.ContentTitle,
 		content.HyphenationTitle,
 		content.ContentText,
@@ -416,7 +406,6 @@ func AddContent(c *fiber.Ctx) (model.Content, error, string) {
 	}
 	var r model.Content
 	r.ContentID = int(lastInsertID)
-	r.ContentGUID = content.ContentGUID
 	r.ContentTitle = content.ContentTitle
 	r.HyphenationTitle = content.HyphenationTitle
 	r.ContentText = content.ContentText
@@ -483,14 +472,14 @@ func DeleteContent(c *fiber.Ctx) (model.Content, error, string) {
 
 func GetExecutives() ([]model.Executives, error, string) {
 	var contents []model.Executives
-	query := "SELECT ExecutivesID,ExecutivesGUID,ExecutivesFirstName,ExecutivesLastName,ExecutivesPosition,ExecutivesBio,ExecutivesInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Executives;"
+	query := "SELECT ExecutivesID,ExecutivesFirstName,ExecutivesLastName,ExecutivesPosition,ExecutivesBio,ExecutivesInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Executives;"
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err, err.Error()
 	}
 	for rows.Next() {
 		var content model.Executives
-		err = rows.Scan(&content.ExecutivesID, &content.ExecutivesGUID, &content.ExecutivesFirstName, &content.ExecutivesLastName, &content.ExecutivesPosition, &content.ExecutivesBio, &content.ExecutivesInactive, &content.CreateBy, &content.CreateDate, &content.UpdateBy, &content.UpdateDate)
+		err = rows.Scan(&content.ExecutivesID, &content.ExecutivesFirstName, &content.ExecutivesLastName, &content.ExecutivesPosition, &content.ExecutivesBio, &content.ExecutivesInactive, &content.CreateBy, &content.CreateDate, &content.UpdateBy, &content.UpdateDate)
 		if err != nil {
 			return nil, err, err.Error()
 		}
@@ -502,98 +491,96 @@ func GetExecutives() ([]model.Executives, error, string) {
 func GetExecutive(c *fiber.Ctx) (model.Executives, error, string) {
 	id, err := strconv.Atoi(c.Params("carid"))
 	var content model.Executives
-	err = db.QueryRow("SELECT ExecutivesID,ExecutivesGUID,ExecutivesFirstName,ExecutivesLastName,ExecutivesPosition,ExecutivesBio,ExecutivesInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Executives WHERE ExecutivesID = ?;", id).Scan(&content.ExecutivesID, &content.ExecutivesGUID, &content.ExecutivesFirstName, &content.ExecutivesLastName, &content.ExecutivesPosition, &content.ExecutivesBio, &content.ExecutivesInactive, &content.CreateBy, &content.CreateDate, &content.UpdateBy, &content.UpdateDate)
+	err = db.QueryRow("SELECT ExecutivesID,ExecutivesFirstName,ExecutivesLastName,ExecutivesPosition,ExecutivesBio,ExecutivesInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Executives WHERE ExecutivesID = ?;", id).Scan(&content.ExecutivesID, &content.ExecutivesFirstName, &content.ExecutivesLastName, &content.ExecutivesPosition, &content.ExecutivesBio, &content.ExecutivesInactive, &content.CreateBy, &content.CreateDate, &content.UpdateBy, &content.UpdateDate)
 	if err != nil {
 		return model.Executives{}, err, err.Error()
 	}
 	return content, nil, "success"
 }
 
-func AddContent(c *fiber.Ctx) (model.Content, error, string) {
-	content := new(model.Content)
-	if err = c.BodyParser(content); err != nil {
-		return model.Content{}, err, err.Error()
-	}
-	stmt, err := db.Prepare("INSERT INTO Content (ContentGUID,ContentTitle,HyphenationTitle,ContentText,Content,ContentInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,?,?,?,User(), NOW(), User(), NOW())")
-	if err != nil {
-		return model.Content{}, err, err.Error()
-	}
-	result, err := stmt.Exec(
-		content.ContentGUID,
-		content.ContentTitle,
-		content.HyphenationTitle,
-		content.ContentText,
-		content.Content,
-		content.ContentInactive,
-	)
-	if err != nil {
-		return model.Content{}, err, err.Error()
-	}
-	lastInsertID, err := result.LastInsertId()
-	if err != nil {
-		return model.Content{}, err, "can't get id"
-	}
-	var r model.Content
-	r.ContentID = int(lastInsertID)
-	r.ContentGUID = content.ContentGUID
-	r.ContentTitle = content.ContentTitle
-	r.HyphenationTitle = content.HyphenationTitle
-	r.ContentText = content.ContentText
-	r.Content = content.Content
-	r.ContentInactive = content.ContentInactive
-	return r, nil, "success"
-}
+// func AddContent(c *fiber.Ctx) (model.Content, error, string) {
+// 	content := new(model.Content)
+// 	if err = c.BodyParser(content); err != nil {
+// 		return model.Content{}, err, err.Error()
+// 	}
+// 	stmt, err := db.Prepare("INSERT INTO Content (ContentTitle,HyphenationTitle,ContentText,Content,ContentInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,?,?,User(), NOW(), User(), NOW())")
+// 	if err != nil {
+// 		return model.Content{}, err, err.Error()
+// 	}
+// 	result, err := stmt.Exec(
+// 		content.ContentTitle,
+// 		content.HyphenationTitle,
+// 		content.ContentText,
+// 		content.Content,
+// 		content.ContentInactive,
+// 	)
+// 	if err != nil {
+// 		return model.Content{}, err, err.Error()
+// 	}
+// 	lastInsertID, err := result.LastInsertId()
+// 	if err != nil {
+// 		return model.Content{}, err, "can't get id"
+// 	}
+// 	var r model.Content
+// 	r.ContentID = int(lastInsertID)
+// 	r.ContentTitle = content.ContentTitle
+// 	r.HyphenationTitle = content.HyphenationTitle
+// 	r.ContentText = content.ContentText
+// 	r.Content = content.Content
+// 	r.ContentInactive = content.ContentInactive
+// 	return r, nil, "success"
+// }
 
-func UpdateContent(c *fiber.Ctx) (model.Content, error, string) {
-	contentid, err := strconv.Atoi(c.Params("contentid"))
-	content := new(model.Content)
-	c.BodyParser(content)
+// func UpdateContent(c *fiber.Ctx) (model.Content, error, string) {
+// 	contentid, err := strconv.Atoi(c.Params("contentid"))
+// 	content := new(model.Content)
+// 	c.BodyParser(content)
 
-	data, err, _ := GetContent(c)
-	if data == (model.Content{}) {
-		return model.Content{}, err, err.Error()
-	}
-	stmt, err := db.Prepare("UPDATE Content SET ContentTitle=?, HyphenationTitle=?, ContentText=?,Content=?,ContentInactive=?, UpdateBy=User(), UpdateDate=NOW() WHERE ContentID=?")
-	if err != nil {
-		return model.Content{}, err, err.Error()
-	}
-	_, err = stmt.Exec(
-		content.ContentTitle,
-		content.HyphenationTitle,
-		content.ContentText,
-		content.Content,
-		content.ContentInactive,
-		contentid,
-	)
-	if err != nil {
-		return model.Content{}, err, err.Error()
-	}
+// 	data, err, _ := GetContent(c)
+// 	if data == (model.Content{}) {
+// 		return model.Content{}, err, err.Error()
+// 	}
+// 	stmt, err := db.Prepare("UPDATE Content SET ContentTitle=?, HyphenationTitle=?, ContentText=?,Content=?,ContentInactive=?, UpdateBy=User(), UpdateDate=NOW() WHERE ContentID=?")
+// 	if err != nil {
+// 		return model.Content{}, err, err.Error()
+// 	}
+// 	_, err = stmt.Exec(
+// 		content.ContentTitle,
+// 		content.HyphenationTitle,
+// 		content.ContentText,
+// 		content.Content,
+// 		content.ContentInactive,
+// 		contentid,
+// 	)
+// 	if err != nil {
+// 		return model.Content{}, err, err.Error()
+// 	}
 
-	var r model.Content
-	r.ContentID = contentid
-	r.ContentTitle = content.ContentTitle
-	r.HyphenationTitle = content.HyphenationTitle
-	r.ContentText = content.ContentText
-	r.Content = content.Content
-	r.ContentInactive = content.ContentInactive
-	return r, nil, "success"
-}
+// 	var r model.Content
+// 	r.ContentID = contentid
+// 	r.ContentTitle = content.ContentTitle
+// 	r.HyphenationTitle = content.HyphenationTitle
+// 	r.ContentText = content.ContentText
+// 	r.Content = content.Content
+// 	r.ContentInactive = content.ContentInactive
+// 	return r, nil, "success"
+// }
 
-func DeleteContent(c *fiber.Ctx) (model.Content, error, string) {
-	contentid, err := strconv.Atoi(c.Params("contentid"))
-	content := new(model.Content)
-	c.BodyParser(content)
-	stmt, err := db.Prepare("DELETE FROM Content WHERE ContentID=?")
-	if err != nil {
-		return model.Content{}, err, err.Error()
-	}
-	_, err = stmt.Exec(
-		contentid,
-	)
-	if err != nil {
-		return model.Content{}, err, err.Error()
-	}
-	return model.Content{}, nil, "success"
-}
+// func DeleteContent(c *fiber.Ctx) (model.Content, error, string) {
+// 	contentid, err := strconv.Atoi(c.Params("contentid"))
+// 	content := new(model.Content)
+// 	c.BodyParser(content)
+// 	stmt, err := db.Prepare("DELETE FROM Content WHERE ContentID=?")
+// 	if err != nil {
+// 		return model.Content{}, err, err.Error()
+// 	}
+// 	_, err = stmt.Exec(
+// 		contentid,
+// 	)
+// 	if err != nil {
+// 		return model.Content{}, err, err.Error()
+// 	}
+// 	return model.Content{}, nil, "success"
+// }
 
 // ## Executives
