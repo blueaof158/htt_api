@@ -498,38 +498,38 @@ func GetExecutive(c *fiber.Ctx) (model.Executives, error, string) {
 	return content, nil, "success"
 }
 
-// func AddContent(c *fiber.Ctx) (model.Content, error, string) {
-// 	content := new(model.Content)
-// 	if err = c.BodyParser(content); err != nil {
-// 		return model.Content{}, err, err.Error()
-// 	}
-// 	stmt, err := db.Prepare("INSERT INTO Content (ContentTitle,HyphenationTitle,ContentText,Content,ContentInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,?,?,User(), NOW(), User(), NOW())")
-// 	if err != nil {
-// 		return model.Content{}, err, err.Error()
-// 	}
-// 	result, err := stmt.Exec(
-// 		content.ContentTitle,
-// 		content.HyphenationTitle,
-// 		content.ContentText,
-// 		content.Content,
-// 		content.ContentInactive,
-// 	)
-// 	if err != nil {
-// 		return model.Content{}, err, err.Error()
-// 	}
-// 	lastInsertID, err := result.LastInsertId()
-// 	if err != nil {
-// 		return model.Content{}, err, "can't get id"
-// 	}
-// 	var r model.Content
-// 	r.ContentID = int(lastInsertID)
-// 	r.ContentTitle = content.ContentTitle
-// 	r.HyphenationTitle = content.HyphenationTitle
-// 	r.ContentText = content.ContentText
-// 	r.Content = content.Content
-// 	r.ContentInactive = content.ContentInactive
-// 	return r, nil, "success"
-// }
+func AddExecutive(c *fiber.Ctx) (model.Executives, error, string) {
+	executive := new(model.Executives)
+	if err = c.BodyParser(executive); err != nil {
+		return model.Executives{}, err, err.Error()
+	}
+	stmt, err := db.Prepare("INSERT INTO Content (ExecutivesFirstName,ExecutivesLastName,ExecutivesPosition,ExecutivesBio,ExecutivesInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,?,?,User(), NOW(), User(), NOW())")
+	if err != nil {
+		return model.Executives{}, err, err.Error()
+	}
+	result, err := stmt.Exec(
+		executive.ExecutivesFirstName,
+		executive.ExecutivesLastName,
+		executive.ExecutivesPosition,
+		executive.ExecutivesBio,
+		executive.ExecutivesInactive,
+	)
+	if err != nil {
+		return model.Executives{}, err, err.Error()
+	}
+	lastInsertID, err := result.LastInsertId()
+	if err != nil {
+		return model.Executives{}, err, "can't get id"
+	}
+	var r model.Executives
+	r.ExecutivesID = int(lastInsertID)
+	r.ExecutivesFirstName = executive.ExecutivesFirstName
+	r.ExecutivesLastName = executive.ExecutivesLastName
+	r.ExecutivesPosition = executive.ExecutivesPosition
+	r.ExecutivesBio = executive.ExecutivesBio
+	r.ExecutivesInactive = executive.ExecutivesInactive
+	return r, nil, "success"
+}
 
 // func UpdateContent(c *fiber.Ctx) (model.Content, error, string) {
 // 	contentid, err := strconv.Atoi(c.Params("contentid"))

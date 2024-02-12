@@ -335,20 +335,20 @@ func GetExecutives(c *fiber.Ctx) error {
 	})
 }
 
-// func GetContent(c *fiber.Ctx) error {
-// 	data, err, msg := services.GetContent(c)
-// 	if err != nil {
-// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-// 			"status":  fiber.StatusBadRequest,
-// 			"message": err.Error(),
-// 		})
-// 	}
-// 	return c.JSON(fiber.Map{
-// 		"data":    data,
-// 		"status":  fiber.StatusOK,
-// 		"message": msg,
-// 	})
-// }
+func GetExecutive(c *fiber.Ctx) error {
+	data, err, msg := services.GetExecutive(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
 
 // func AddContent(c *fiber.Ctx) error {
 // 	data, err, msg := services.AddContent(c)
