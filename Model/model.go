@@ -61,12 +61,18 @@ type Executives struct {
 }
 
 type Images struct {
-	ImagesID   int    `json:"imagesid"`
-	ImagePath  string `json:"imagepath"`
-	CreateBy   string `json:"createBy"`
-	CreateDate string `json:"createDate"`
-	UpdateBy   string `json:"updateBy"`
-	UpdateDate string `json:"updateDate"`
+	ImagesID     int    `json:"imagesid"`
+	CarTypeID    int    `json:"cartypeid"`
+	CarID        int    `json:"carid"`
+	AwardID      int    `json:"awardID"`
+	ContentID    int    `json:"contentid"`
+	ExecutivesID int    `json:"executivesid"`
+	BannerTopID  int    `json:"bannertopid"`
+	ImagePath    string `json:"imagepath"`
+	CreateBy     string `json:"createBy"`
+	CreateDate   string `json:"createDate"`
+	UpdateBy     string `json:"updateBy"`
+	UpdateDate   string `json:"updateDate"`
 }
 
 type JobApplications struct {
