@@ -51,11 +51,11 @@ func route(app *fiber.App) {
 	app.Put("/api/updatecontent/:contentid", controller.UpdateContent)
 	app.Delete("/api/deletecontent/:contentid", controller.DeleteContent)
 
-	// app.Get("/api/executives", controller.GetExecutives)
-	// app.Get("/api/executive/:executivesid", controller.GetExecutive)
-	// app.Post("/api/addexecutive/:executivesid", controller.AddExecutive)
-	// app.Put("/api/updateexecutive/:executivesid", controller.UpdateExecutive)
-	// app.Delete("/api/deleteexecutive/:executivesid", controller.DeleteExecutive)
+	app.Get("/api/executives", controller.GetExecutives)
+	app.Get("/api/executive/:executivesid", controller.GetExecutive)
+	app.Post("/api/addexecutive/:executivesid", controller.AddExecutive)
+	app.Put("/api/updateexecutive/:executivesid", controller.UpdateExecutive)
+	app.Delete("/api/deleteexecutive/:executivesid", controller.DeleteExecutive)
 
 	app.Listen(":8080")
 

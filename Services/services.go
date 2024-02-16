@@ -5,19 +5,11 @@ import (
 	model "HTTApi/Model"
 	"strconv"
 
-	"log"
-
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gofiber/fiber/v2"
 )
 
 var db, err = database.ConnectDB()
-
-func main() {
-	if err != nil {
-		log.Fatal("Cant Connect Database")
-	}
-}
 
 // ## CarType
 func GetCarTypes() ([]model.CarType, error, string) {
@@ -478,24 +470,24 @@ func GetExecutives() ([]model.Executives, error, string) {
 		return nil, err, err.Error()
 	}
 	for rows.Next() {
-		var content model.Executives
-		err = rows.Scan(&content.ExecutivesID, &content.ExecutivesFirstName, &content.ExecutivesLastName, &content.ExecutivesPosition, &content.ExecutivesBio, &content.ExecutivesInactive, &content.CreateBy, &content.CreateDate, &content.UpdateBy, &content.UpdateDate)
+		var executive model.Executives
+		err = rows.Scan(&executive.ExecutivesID, &executive.ExecutivesFirstName, &executive.ExecutivesLastName, &executive.ExecutivesPosition, &executive.ExecutivesBio, &executive.ExecutivesInactive, &executive.CreateBy, &executive.CreateDate, &executive.UpdateBy, &executive.UpdateDate)
 		if err != nil {
 			return nil, err, err.Error()
 		}
-		contents = append(contents, content)
+		contents = append(contents, executive)
 	}
 	return contents, nil, "success"
 }
 
 func GetExecutive(c *fiber.Ctx) (model.Executives, error, string) {
-	id, err := strconv.Atoi(c.Params("carid"))
-	var content model.Executives
-	err = db.QueryRow("SELECT ExecutivesID,ExecutivesFirstName,ExecutivesLastName,ExecutivesPosition,ExecutivesBio,ExecutivesInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Executives WHERE ExecutivesID = ?;", id).Scan(&content.ExecutivesID, &content.ExecutivesFirstName, &content.ExecutivesLastName, &content.ExecutivesPosition, &content.ExecutivesBio, &content.ExecutivesInactive, &content.CreateBy, &content.CreateDate, &content.UpdateBy, &content.UpdateDate)
+	id, err := strconv.Atoi(c.Params("executivesid"))
+	var executive model.Executives
+	err = db.QueryRow("SELECT ExecutivesID,ExecutivesFirstName,ExecutivesLastName,ExecutivesPosition,ExecutivesBio,ExecutivesInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Executives WHERE ExecutivesID = ?;", id).Scan(&executive.ExecutivesID, &executive.ExecutivesFirstName, &executive.ExecutivesLastName, &executive.ExecutivesPosition, &executive.ExecutivesBio, &executive.ExecutivesInactive, &executive.CreateBy, &executive.CreateDate, &executive.UpdateBy, &executive.UpdateDate)
 	if err != nil {
 		return model.Executives{}, err, err.Error()
 	}
-	return content, nil, "success"
+	return executive, nil, "success"
 }
 
 func AddExecutive(c *fiber.Ctx) (model.Executives, error, string) {
@@ -503,7 +495,7 @@ func AddExecutive(c *fiber.Ctx) (model.Executives, error, string) {
 	if err = c.BodyParser(executive); err != nil {
 		return model.Executives{}, err, err.Error()
 	}
-	stmt, err := db.Prepare("INSERT INTO Content (ExecutivesFirstName,ExecutivesLastName,ExecutivesPosition,ExecutivesBio,ExecutivesInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,?,?,User(), NOW(), User(), NOW())")
+	stmt, err := db.Prepare("INSERT INTO Executives (ExecutivesFirstName,ExecutivesLastName,ExecutivesPosition,ExecutivesBio,ExecutivesInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,?,?,User(), NOW(), User(), NOW())")
 	if err != nil {
 		return model.Executives{}, err, err.Error()
 	}
@@ -531,56 +523,56 @@ func AddExecutive(c *fiber.Ctx) (model.Executives, error, string) {
 	return r, nil, "success"
 }
 
-// func UpdateContent(c *fiber.Ctx) (model.Content, error, string) {
-// 	contentid, err := strconv.Atoi(c.Params("contentid"))
-// 	content := new(model.Content)
-// 	c.BodyParser(content)
+func UpdateExecutive(c *fiber.Ctx) (model.Executives, error, string) {
+	executivesid, err := strconv.Atoi(c.Params("executivesid"))
+	content := new(model.Executives)
+	c.BodyParser(content)
 
-// 	data, err, _ := GetContent(c)
-// 	if data == (model.Content{}) {
-// 		return model.Content{}, err, err.Error()
-// 	}
-// 	stmt, err := db.Prepare("UPDATE Content SET ContentTitle=?, HyphenationTitle=?, ContentText=?,Content=?,ContentInactive=?, UpdateBy=User(), UpdateDate=NOW() WHERE ContentID=?")
-// 	if err != nil {
-// 		return model.Content{}, err, err.Error()
-// 	}
-// 	_, err = stmt.Exec(
-// 		content.ContentTitle,
-// 		content.HyphenationTitle,
-// 		content.ContentText,
-// 		content.Content,
-// 		content.ContentInactive,
-// 		contentid,
-// 	)
-// 	if err != nil {
-// 		return model.Content{}, err, err.Error()
-// 	}
+	data, err, _ := GetContent(c)
+	if data == (model.Content{}) {
+		return model.Executives{}, err, err.Error()
+	}
+	stmt, err := db.Prepare("UPDATE Executives SET ExecutivesFirstName=?, ExecutivesLastName=?, ExecutivesPosition=?,ExecutivesBio=?,ExecutivesInactive=?, UpdateBy=User(), UpdateDate=NOW() WHERE ExecutivesID=?")
+	if err != nil {
+		return model.Executives{}, err, err.Error()
+	}
+	_, err = stmt.Exec(
+		content.ExecutivesFirstName,
+		content.ExecutivesLastName,
+		content.ExecutivesPosition,
+		content.ExecutivesBio,
+		content.ExecutivesInactive,
+		executivesid,
+	)
+	if err != nil {
+		return model.Executives{}, err, err.Error()
+	}
 
-// 	var r model.Content
-// 	r.ContentID = contentid
-// 	r.ContentTitle = content.ContentTitle
-// 	r.HyphenationTitle = content.HyphenationTitle
-// 	r.ContentText = content.ContentText
-// 	r.Content = content.Content
-// 	r.ContentInactive = content.ContentInactive
-// 	return r, nil, "success"
-// }
+	var r model.Executives
+	r.ExecutivesID = executivesid
+	r.ExecutivesFirstName = content.ExecutivesFirstName
+	r.ExecutivesLastName = content.ExecutivesLastName
+	r.ExecutivesPosition = content.ExecutivesPosition
+	r.ExecutivesBio = content.ExecutivesBio
+	r.ExecutivesInactive = content.ExecutivesInactive
+	return r, nil, "success"
+}
 
-// func DeleteContent(c *fiber.Ctx) (model.Content, error, string) {
-// 	contentid, err := strconv.Atoi(c.Params("contentid"))
-// 	content := new(model.Content)
-// 	c.BodyParser(content)
-// 	stmt, err := db.Prepare("DELETE FROM Content WHERE ContentID=?")
-// 	if err != nil {
-// 		return model.Content{}, err, err.Error()
-// 	}
-// 	_, err = stmt.Exec(
-// 		contentid,
-// 	)
-// 	if err != nil {
-// 		return model.Content{}, err, err.Error()
-// 	}
-// 	return model.Content{}, nil, "success"
-// }
+func DeleteExecutive(c *fiber.Ctx) (model.Executives, error, string) {
+	executivesid, err := strconv.Atoi(c.Params("executivesid"))
+	executiv := new(model.Executives)
+	c.BodyParser(executiv)
+	stmt, err := db.Prepare("DELETE FROM Executives WHERE ExecutivesID=?")
+	if err != nil {
+		return model.Executives{}, err, err.Error()
+	}
+	_, err = stmt.Exec(
+		executivesid,
+	)
+	if err != nil {
+		return model.Executives{}, err, err.Error()
+	}
+	return model.Executives{}, nil, "success"
+}
 
 // ## Executives

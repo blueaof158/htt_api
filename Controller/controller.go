@@ -350,35 +350,35 @@ func GetExecutive(c *fiber.Ctx) error {
 	})
 }
 
-// func AddContent(c *fiber.Ctx) error {
-// 	data, err, msg := services.AddContent(c)
-// 	if err != nil {
-// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-// 			"status":  fiber.StatusBadRequest,
-// 			"message": err.Error(),
-// 		})
-// 	}
-// 	return c.JSON(fiber.Map{
-// 		"data":    data,
-// 		"status":  fiber.StatusOK,
-// 		"message": msg,
-// 	})
-// }
+func AddExecutive(c *fiber.Ctx) error {
+	data, err, msg := services.AddExecutive(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
 
-// func UpdateContent(c *fiber.Ctx) error {
-// 	data, err, msg := services.UpdateContent(c)
-// 	if err != nil {
-// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-// 			"status":  fiber.StatusBadRequest,
-// 			"message": err.Error(),
-// 		})
-// 	}
-// 	return c.JSON(fiber.Map{
-// 		"data":    data,
-// 		"status":  fiber.StatusOK,
-// 		"message": msg,
-// 	})
-// }
+func UpdateExecutive(c *fiber.Ctx) error {
+	data, err, msg := services.UpdateExecutive(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
 
 // func DeleteContent(c *fiber.Ctx) error {
 // 	data, err, msg := services.DeleteContent(c)
