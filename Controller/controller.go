@@ -380,18 +380,19 @@ func UpdateExecutive(c *fiber.Ctx) error {
 	})
 }
 
-// func DeleteContent(c *fiber.Ctx) error {
-// 	data, err, msg := services.DeleteContent(c)
-// 	if err != nil {
-// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-// 			"status":  fiber.StatusBadRequest,
-// 			"message": err.Error(),
-// 		})
-// 	}
-// 	return c.JSON(fiber.Map{
-// 		"data":    data,
-// 		"status":  fiber.StatusOK,
-// 		"message": msg,
-// 	})
-// }
+func DeleteExecutive(c *fiber.Ctx) error {
+	data, err, msg := services.DeleteExecutive(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
+
 // ## Executives

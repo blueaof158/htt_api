@@ -5,10 +5,10 @@ type CarType struct {
 	CarTypeName        string `json:"cartypeName"`
 	CarTypeDesctiption string `json:"cartypedesctiption"`
 	CarTypeInactive    int    `json:"cartypeinactive"`
-	CreateBy           string `json:"createBy"`
-	CreateDate         string `json:"createDate"`
-	UpdateBy           string `json:"updateBy"`
-	UpdateDate         string `json:"updateDate"`
+	CreateBy           string `json:"createby"`
+	CreateDate         string `json:"createdate"`
+	UpdateBy           string `json:"updateby"`
+	UpdateDate         string `json:"updatedate"`
 }
 
 type Award struct {
@@ -16,10 +16,10 @@ type Award struct {
 	AwardName        string `json:"awardname"`
 	AwardDescription string `json:"awarddescription"`
 	AwardInactive    int    `json:"awardInactive"`
-	CreateBy         string `json:"createBy"`
-	CreateDate       string `json:"createDate"`
-	UpdateBy         string `json:"updateBy"`
-	UpdateDate       string `json:"updateDate"`
+	CreateBy         string `json:"createby"`
+	CreateDate       string `json:"createdate"`
+	UpdateBy         string `json:"updateby"`
+	UpdateDate       string `json:"updatedate"`
 }
 
 type Car struct {
@@ -28,10 +28,10 @@ type Car struct {
 	CarDesctiption string `json:"cardesctiption"`
 	CarTypeID      int    `json:"cartypeID"`
 	CarInactive    int    `json:"carInactive"`
-	CreateBy       string `json:"createBy"`
-	CreateDate     string `json:"createDate"`
-	UpdateBy       string `json:"updateBy"`
-	UpdateDate     string `json:"updateDate"`
+	CreateBy       string `json:"createby"`
+	CreateDate     string `json:"createdate"`
+	UpdateBy       string `json:"updateby"`
+	UpdateDate     string `json:"updatedate"`
 }
 
 type Content struct {
@@ -41,10 +41,10 @@ type Content struct {
 	ContentText      string `json:"contenttext"`
 	Content          string `json:"content"`
 	ContentInactive  int    `json:"contentInactive"`
-	CreateBy         string `json:"createBy"`
-	CreateDate       string `json:"createDate"`
-	UpdateBy         string `json:"updateBy"`
-	UpdateDate       string `json:"updateDate"`
+	CreateBy         string `json:"createby"`
+	CreateDate       string `json:"createdate"`
+	UpdateBy         string `json:"updateby"`
+	UpdateDate       string `json:"updatedate"`
 }
 
 type Executives struct {
@@ -54,10 +54,10 @@ type Executives struct {
 	ExecutivesPosition  string `json:"executivesposition"`
 	ExecutivesBio       string `json:"executivesbio"`
 	ExecutivesInactive  int    `json:"executivesinactive"`
-	CreateBy            string `json:"createBy"`
-	CreateDate          string `json:"createDate"`
-	UpdateBy            string `json:"updateBy"`
-	UpdateDate          string `json:"updateDate"`
+	CreateBy            string `json:"createby"`
+	CreateDate          string `json:"createdate"`
+	UpdateBy            string `json:"updateby"`
+	UpdateDate          string `json:"updatedate"`
 }
 
 type Images struct {
@@ -69,10 +69,10 @@ type Images struct {
 	ExecutivesID int    `json:"executivesid"`
 	BannerTopID  int    `json:"bannertopid"`
 	ImagePath    string `json:"imagepath"`
-	CreateBy     string `json:"createBy"`
-	CreateDate   string `json:"createDate"`
-	UpdateBy     string `json:"updateBy"`
-	UpdateDate   string `json:"updateDate"`
+	CreateBy     string `json:"createby"`
+	CreateDate   string `json:"createdate"`
+	UpdateBy     string `json:"updateby"`
+	UpdateDate   string `json:"updatedate"`
 }
 
 type JobApplications struct {
@@ -82,30 +82,30 @@ type JobApplications struct {
 	JobApplicationsDescription string `json:"jobapplicationsdescription"`
 	JobApplicationsInactive    int    `json:"jobapplicationsinactive"`
 	JobApplicationFilePath     string `json:"jobapplicationfilepath"`
-	CreateBy                   string `json:"createBy"`
-	CreateDate                 string `json:"createDate"`
-	UpdateBy                   string `json:"updateBy"`
-	UpdateDate                 string `json:"updateDate"`
+	CreateBy                   string `json:"createby"`
+	CreateDate                 string `json:"createdate"`
+	UpdateBy                   string `json:"updateby"`
+	UpdateDate                 string `json:"updatedate"`
 }
 
 type OtherConfigs struct {
 	OtherConfigsID int    `json:"otherconfigsid"`
 	ConfigName     string `json:"configname"`
 	Value          string `json:"value"`
-	CreateBy       string `json:"createBy"`
-	CreateDate     string `json:"createDate"`
-	UpdateBy       string `json:"updateBy"`
-	UpdateDate     string `json:"updateDate"`
+	CreateBy       string `json:"createby"`
+	CreateDate     string `json:"createdate"`
+	UpdateBy       string `json:"updateby"`
+	UpdateDate     string `json:"updatedate"`
 }
 
 type Seo struct {
 	SeoID      int    `json:"seoid"`
 	ConfigName string `json:"configname"`
 	Value      string `json:"value"`
-	CreateBy   string `json:"createBy"`
-	CreateDate string `json:"createDate"`
-	UpdateBy   string `json:"updateBy"`
-	UpdateDate string `json:"updateDate"`
+	CreateBy   string `json:"createby"`
+	CreateDate string `json:"createdate"`
+	UpdateBy   string `json:"updateby"`
+	UpdateDate string `json:"updatedate"`
 }
 
 type User struct {
@@ -113,10 +113,10 @@ type User struct {
 	User       string `json:"user"`
 	Password   string `json:"uassword"`
 	Inactive   int    `json:"inactive"`
-	CreateBy   string `json:"createBy"`
-	CreateDate string `json:"createDate"`
-	UpdateBy   string `json:"updateBy"`
-	UpdateDate string `json:"updateDate"`
+	CreateBy   string `json:"createby"`
+	CreateDate string `json:"createdate"`
+	UpdateBy   string `json:"updateby"`
+	UpdateDate string `json:"updatedate"`
 }
 
 type BannerTop struct {
@@ -124,10 +124,10 @@ type BannerTop struct {
 	BannerTopImagegPath string `json:"bannertopimagegpath"`
 	BannerTopImageLink  string `json:"bannertopimagelink"`
 	BannerTopInactive   int    `json:"bannertopinactive"`
-	CreateBy            string `json:"createBy"`
-	CreateDate          string `json:"createDate"`
-	UpdateBy            string `json:"updateBy"`
-	UpdateDate          string `json:"updateDate"`
+	CreateBy            string `json:"createby"`
+	CreateDate          string `json:"createdate"`
+	UpdateBy            string `json:"updateby"`
+	UpdateDate          string `json:"updatedate"`
 }
 
 type Login struct {
