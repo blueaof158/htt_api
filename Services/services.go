@@ -576,3 +576,115 @@ func DeleteExecutive(c *fiber.Ctx) (model.Executives, error, string) {
 }
 
 // ## Executives
+
+// ## BannerTop
+func GetBannerTops() ([]model.BannerTop, error, string) {
+	var bannertops []model.BannerTop
+	query := "SELECT BannerTopID,BannerTopImagegPath,BannerTopImageLink,BannerTopInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Executives;"
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err, err.Error()
+	}
+	for rows.Next() {
+		var bannertop model.BannerTop
+		err = rows.Scan(&bannertop.BannerTopID, &bannertop.BannerTopImagegPath, &bannertop.BannerTopImageLink, &bannertop.BannerTopInactive, &bannertop.CreateBy, &bannertop.CreateDate, &bannertop.UpdateBy, &bannertop.UpdateDate)
+		if err != nil {
+			return nil, err, err.Error()
+		}
+		bannertops = append(bannertops, bannertop)
+	}
+	return bannertops, nil, "success"
+}
+
+func GetBannerTop(c *fiber.Ctx) (model.BannerTop, error, string) {
+	id, err := strconv.Atoi(c.Params("bannertopid"))
+	var bannertop model.BannerTop
+	err = db.QueryRow("SELECT BannerTopID,BannerTopImagegPath,BannerTopImageLink,BannerTopInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM BannerTop WHERE ExecutivesID = ?;", id).Scan(&bannertop.BannerTopID, &bannertop.BannerTopImagegPath, &bannertop.BannerTopImageLink, &bannertop.BannerTopInactive, &bannertop.CreateBy, &bannertop.CreateDate, &bannertop.UpdateBy, &bannertop.UpdateDate)
+	if err != nil {
+		return model.BannerTop{}, err, err.Error()
+	}
+	return bannertop, nil, "success"
+}
+
+func AddBannerTop(c *fiber.Ctx) (model.BannerTop, error, string) {
+	bannertop := new(model.BannerTop)
+	if err = c.BodyParser(bannertop); err != nil {
+		return model.BannerTop{}, err, err.Error()
+	}
+	stmt, err := db.Prepare("INSERT INTO BannerTop (BannerTopImagegPath,BannerTopImageLink,BannerTopInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,User(), NOW(), User(), NOW())")
+	if err != nil {
+		return model.BannerTop{}, err, err.Error()
+	}
+	result, err := stmt.Exec(
+		bannertop.BannerTopImagegPath,
+		bannertop.BannerTopImageLink,
+		bannertop.BannerTopInactive,
+	)
+	if err != nil {
+		return model.BannerTop{}, err, err.Error()
+	}
+	lastInsertID, err := result.LastInsertId()
+	if err != nil {
+		return model.BannerTop{}, err, "can't get id"
+	}
+	var r model.BannerTop
+	r.BannerTopID = int(lastInsertID)
+	r.BannerTopImagegPath = bannertop.BannerTopImagegPath
+	r.BannerTopImageLink = bannertop.BannerTopImageLink
+	r.BannerTopInactive = bannertop.BannerTopInactive
+	return r, nil, "success"
+}
+
+func UpdateBannerTop(c *fiber.Ctx) (model.BannerTop, error, string) {
+	bannertopid, err := strconv.Atoi(c.Params("bannertopid"))
+	content := new(model.BannerTop)
+	c.BodyParser(content)
+
+	data, err, _ := GetContent(c)
+	if data == (model.Content{}) {
+		return model.BannerTop{}, err, err.Error()
+	}
+	stmt, err := db.Prepare("UPDATE BannerTop SET ExecutivesFirstName=?, ExecutivesLastName=?, ExecutivesPosition=?,ExecutivesBio=?,ExecutivesInactive=?, UpdateBy=User(), UpdateDate=NOW() WHERE ExecutivesID=?")
+	if err != nil {
+		return model.BannerTop{}, err, err.Error()
+	}
+	_, err = stmt.Exec(
+		content.ExecutivesFirstName,
+		content.ExecutivesLastName,
+		content.ExecutivesPosition,
+		content.ExecutivesBio,
+		content.ExecutivesInactive,
+		executivesid,
+	)
+	if err != nil {
+		return model.Executives{}, err, err.Error()
+	}
+
+	var r model.Executives
+	r.ExecutivesID = executivesid
+	r.ExecutivesFirstName = content.ExecutivesFirstName
+	r.ExecutivesLastName = content.ExecutivesLastName
+	r.ExecutivesPosition = content.ExecutivesPosition
+	r.ExecutivesBio = content.ExecutivesBio
+	r.ExecutivesInactive = content.ExecutivesInactive
+	return r, nil, "success"
+}
+
+func DeleteBannerTop(c *fiber.Ctx) (model.BannerTop, error, string) {
+	executivesid, err := strconv.Atoi(c.Params("executivesid"))
+	executiv := new(model.Executives)
+	c.BodyParser(executiv)
+	stmt, err := db.Prepare("DELETE FROM Executives WHERE ExecutivesID=?")
+	if err != nil {
+		return model.Executives{}, err, err.Error()
+	}
+	_, err = stmt.Exec(
+		executivesid,
+	)
+	if err != nil {
+		return model.Executives{}, err, err.Error()
+	}
+	return model.Executives{}, nil, "success"
+}
+
+// ## BannerTop

@@ -57,6 +57,12 @@ func route(app *fiber.App) {
 	app.Put("/api/updateexecutive/:executivesid", controller.UpdateExecutive)
 	app.Delete("/api/deleteexecutive/:executivesid", controller.DeleteExecutive)
 
+	app.Get("/api/bannertops", controller.GetBannerTop)
+	app.Get("/api/bannertop/:bannertopid", controller.GetBannerTop)
+	app.Post("/api/addbannertop/:bannertopid", controller.AddBannerTop)
+	app.Put("/api/updatebannertop/:bannertopid", controller.UpdateBannerTop)
+	app.Delete("/api/deletebannertop/:bannertopid", controller.DeleteBannerTop)
+
 	app.Listen(":8080")
 
 }
