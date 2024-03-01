@@ -399,7 +399,7 @@ func DeleteExecutive(c *fiber.Ctx) error {
 
 // ## BannerTop
 func GetBannerTops(c *fiber.Ctx) error {
-	data, err, msg := services.GetExecutives()
+	data, err, msg := services.GetBannerTops()
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  fiber.StatusBadRequest,
@@ -414,7 +414,7 @@ func GetBannerTops(c *fiber.Ctx) error {
 }
 
 func GetBannerTop(c *fiber.Ctx) error {
-	data, err, msg := services.GetExecutive(c)
+	data, err, msg := services.GetBannerTop(c)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  fiber.StatusBadRequest,
@@ -429,7 +429,7 @@ func GetBannerTop(c *fiber.Ctx) error {
 }
 
 func AddBannerTop(c *fiber.Ctx) error {
-	data, err, msg := services.AddExecutive(c)
+	data, err, msg := services.AddBannerTop(c)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  fiber.StatusBadRequest,
@@ -444,7 +444,7 @@ func AddBannerTop(c *fiber.Ctx) error {
 }
 
 func UpdateBannerTop(c *fiber.Ctx) error {
-	data, err, msg := services.UpdateExecutive(c)
+	data, err, msg := services.UpdateBannerTop(c)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  fiber.StatusBadRequest,
@@ -459,7 +459,7 @@ func UpdateBannerTop(c *fiber.Ctx) error {
 }
 
 func DeleteBannerTop(c *fiber.Ctx) error {
-	data, err, msg := services.DeleteExecutive(c)
+	data, err, msg := services.DeleteBannerTop(c)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  fiber.StatusBadRequest,
