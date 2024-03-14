@@ -47,7 +47,7 @@ func AddCarType(c *fiber.Ctx) (model.CarType, error, string) {
 	if err = c.BodyParser(cartype); err != nil {
 		return model.CarType{}, err, err.Error()
 	}
-	stmt, err := db.Prepare("INSERT INTO CarType (CarTypeName,CarTypeDesctiption,CarTypeInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?, ?, ?, ?, User(), NOW(), User(), NOW())")
+	stmt, err := db.Prepare("INSERT INTO CarType (CarTypeName,CarTypeDesctiption,CarTypeInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?, ?, ?, User(), NOW(), User(), NOW())")
 	if err != nil {
 		return model.CarType{}, err, err.Error()
 	}
