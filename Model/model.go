@@ -120,14 +120,14 @@ type User struct {
 }
 
 type BannerTop struct {
-	BannerTopID         int    `json:"bannertopid"`
-	BannerTopImagegPath string `json:"bannertopimagegpath"`
-	BannerTopImageLink  string `json:"bannertopimagelink"`
-	BannerTopInactive   int    `json:"bannertopinactive"`
-	CreateBy            string `json:"createby"`
-	CreateDate          string `json:"createdate"`
-	UpdateBy            string `json:"updateby"`
-	UpdateDate          string `json:"updatedate"`
+	BannerTopID        int    `json:"bannertopid"`
+	BannerTopImageLink string `json:"bannertopimagelink"`
+	BannerTopInactive  int    `json:"bannertopinactive"`
+	ImagePath          string `json:"imagepath"`
+	CreateBy           string `json:"createby"`
+	CreateDate         string `json:"createdate"`
+	UpdateBy           string `json:"updateby"`
+	UpdateDate         string `json:"updatedate"`
 }
 
 type Login struct {

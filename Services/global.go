@@ -4,6 +4,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func InsertImage() {
+func InsertImage(path string, imagetype string) {
 
 }

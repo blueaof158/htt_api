@@ -580,14 +580,14 @@ func DeleteExecutive(c *fiber.Ctx) (model.Executives, error, string) {
 // ## BannerTop
 func GetBannerTops() ([]model.BannerTop, error, string) {
 	var bannertops []model.BannerTop
-	query := "SELECT BannerTopID,BannerTopImagegPath,BannerTopImageLink,BannerTopInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Executives;"
+	query := "SELECT BT.BannerTopID,BT.BannerTopImageLink,BT.BannerTopInactive,BT.CreateBy,BT.CreateDate,BT.UpdateBy,BT.UpdateDate,Img.ImagePath FROM Htt.BannerTop BT LEFT JOIN Htt.Images Img ON BT.BannerTopID = Img.BannerTopID;"
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err, err.Error()
 	}
 	for rows.Next() {
 		var bannertop model.BannerTop
-		err = rows.Scan(&bannertop.BannerTopID, &bannertop.BannerTopImagegPath, &bannertop.BannerTopImageLink, &bannertop.BannerTopInactive, &bannertop.CreateBy, &bannertop.CreateDate, &bannertop.UpdateBy, &bannertop.UpdateDate)
+		err = rows.Scan(&bannertop.BannerTopID, &bannertop.ImagePath, &bannertop.BannerTopImageLink, &bannertop.BannerTopInactive, &bannertop.CreateBy, &bannertop.CreateDate, &bannertop.UpdateBy, &bannertop.UpdateDate)
 		if err != nil {
 			return nil, err, err.Error()
 		}
@@ -599,7 +599,9 @@ func GetBannerTops() ([]model.BannerTop, error, string) {
 func GetBannerTop(c *fiber.Ctx) (model.BannerTop, error, string) {
 	id, err := strconv.Atoi(c.Params("bannertopid"))
 	var bannertop model.BannerTop
-	err = db.QueryRow("SELECT BannerTopID,BannerTopImagegPath,BannerTopImageLink,BannerTopInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM BannerTop WHERE ExecutivesID = ?;", id).Scan(&bannertop.BannerTopID, &bannertop.BannerTopImagegPath, &bannertop.BannerTopImageLink, &bannertop.BannerTopInactive, &bannertop.CreateBy, &bannertop.CreateDate, &bannertop.UpdateBy, &bannertop.UpdateDate)
+
+	err = db.QueryRow("SELECT BT.BannerTopID,BT.BannerTopImagegPath,BT.BannerTopImageLink,BT.BannerTopInactive,BT.CreateBy,BT.CreateDate,BT.UpdateBy,BT.UpdateDate,IMG.ImagePath FROM Htt.BannerTop BT LEFT JOIN Images Img ON BT.BannerTopID = Img.BannerTopID WHERE BT.BannerTopID = ?;", id).Scan(&bannertop.BannerTopID, &bannertop.ImagePath, &bannertop.BannerTopImageLink, &bannertop.BannerTopInactive, &bannertop.CreateBy, &bannertop.CreateDate, &bannertop.UpdateBy, &bannertop.UpdateDate)
+	// err = db.QueryRow("SELECT BannerTopID,BannerTopImagegPath,BannerTopImageLink,BannerTopInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM BannerTop WHERE ExecutivesID = ?;", id).Scan(&bannertop.BannerTopID, &bannertop.BannerTopImagegPath, &bannertop.BannerTopImageLink, &bannertop.BannerTopInactive, &bannertop.CreateBy, &bannertop.CreateDate, &bannertop.UpdateBy, &bannertop.UpdateDate)
 	if err != nil {
 		return model.BannerTop{}, err, err.Error()
 	}
@@ -616,7 +618,7 @@ func AddBannerTop(c *fiber.Ctx) (model.BannerTop, error, string) {
 		return model.BannerTop{}, err, err.Error()
 	}
 	result, err := stmt.Exec(
-		bannertop.BannerTopImagegPath,
+		// bannertop.BannerTopImagegPath,
 		bannertop.BannerTopImageLink,
 		bannertop.BannerTopInactive,
 	)
@@ -624,12 +626,13 @@ func AddBannerTop(c *fiber.Ctx) (model.BannerTop, error, string) {
 		return model.BannerTop{}, err, err.Error()
 	}
 	lastInsertID, err := result.LastInsertId()
+
 	if err != nil {
 		return model.BannerTop{}, err, "can't get id"
 	}
 	var r model.BannerTop
 	r.BannerTopID = int(lastInsertID)
-	r.BannerTopImagegPath = bannertop.BannerTopImagegPath
+	// r.BannerTopImagegPath = bannertop.BannerTopImagegPath
 	r.BannerTopImageLink = bannertop.BannerTopImageLink
 	r.BannerTopInactive = bannertop.BannerTopInactive
 	return r, nil, "success"
@@ -649,7 +652,7 @@ func UpdateBannerTop(c *fiber.Ctx) (model.BannerTop, error, string) {
 		return model.BannerTop{}, err, err.Error()
 	}
 	_, err = stmt.Exec(
-		content.BannerTopImagegPath,
+		// content.BannerTopImagegPath,
 		content.BannerTopImageLink,
 		content.BannerTopInactive,
 		bannertopid,
@@ -660,7 +663,7 @@ func UpdateBannerTop(c *fiber.Ctx) (model.BannerTop, error, string) {
 
 	var r model.BannerTop
 	r.BannerTopID = bannertopid
-	r.BannerTopImagegPath = content.BannerTopImagegPath
+	// r.BannerTopImagegPath = content.BannerTopImagegPath
 	r.BannerTopImageLink = content.BannerTopImageLink
 	r.BannerTopInactive = content.BannerTopInactive
 	return r, nil, "success"

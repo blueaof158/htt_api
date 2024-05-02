@@ -2,6 +2,7 @@ package main
 
 import (
 	auth "HTTApi/Auth"
+	route "HTTApi/Route"
 	"database/sql"
 	"fmt"
 	"log"
@@ -24,7 +25,7 @@ func main() {
 		log.Fatal("load .env failed")
 	}
 	app := fiber.New()
-	route(app)
+	route.Route(app)
 }
 
 func getEnv(c *fiber.Ctx) error {
