@@ -5,10 +5,16 @@ type CarType struct {
 	CarTypeName        string `json:"cartypename"`
 	CarTypeDesctiption string `json:"cartypedesctiption"`
 	CarTypeInactive    int    `json:"cartypeinactive"`
+	Image64            string `json:"image64"`
 	CreateBy           string `json:"createby"`
 	CreateDate         string `json:"createdate"`
 	UpdateBy           string `json:"updateby"`
 	UpdateDate         string `json:"updatedate"`
+}
+
+type CarTypeLst struct {
+	CarTypeID   int    `json:"cartypeid"`
+	CarTypeName string `json:"cartypename"`
 }
 
 type Award struct {
@@ -32,6 +38,14 @@ type Car struct {
 	CreateDate     string `json:"createdate"`
 	UpdateBy       string `json:"updateby"`
 	UpdateDate     string `json:"updatedate"`
+	Image64        string `json:"image64"`
+	CarTypeName    string `json:"cartypename"`
+}
+
+type ImageJson struct {
+	Id        int      `json:"id"`
+	ImageType string   `json:"imagetype"`
+	Image64   []string `json:"image64"`
 }
 
 type Content struct {

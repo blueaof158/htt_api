@@ -26,6 +26,7 @@ func Route(app *fiber.App) {
 	app.Get("/api/getenv/:name", getEnv)
 
 	app.Get("/api/getcartypes", controller.GetCarTypes)
+	app.Get("/api/getcartypeslst", controller.GetCarTypesLst)
 	app.Get("/api/getcartype/:cartypeid", controller.GetCarType)
 	app.Post("/api/addcartype", controller.AddCarType)
 	app.Put("/api/updatecartype/:cartypeid", controller.UpdateCarType)
@@ -40,9 +41,9 @@ func Route(app *fiber.App) {
 
 	app.Get("/api/cars", controller.GetCars)
 	app.Get("/api/car/:carid", controller.GetCar)
-	app.Post("/api/addcar/:carid", controller.AddCar)
+	app.Post("/api/addcar", controller.AddCar)
 	app.Put("/api/updatecar/:carid", controller.UpdateCar)
-	app.Delete("/api/deletecar/:carid", controller.DeleteCarType)
+	app.Delete("/api/deletecar/:carid", controller.DeleteCar)
 
 	app.Get("/api/contents", controller.GetContents)
 	app.Get("/api/content/:contentid", controller.GetContent)
@@ -58,9 +59,12 @@ func Route(app *fiber.App) {
 
 	app.Get("/api/bannertops", controller.GetBannerTops)
 	app.Get("/api/bannertop/:bannertopid", controller.GetBannerTop)
-	app.Post("/api/addbannertop/:bannertopid", controller.AddBannerTop)
+	app.Post("/api/addbannertop", controller.AddBannerTop)
 	app.Put("/api/updatebannertop/:bannertopid", controller.UpdateBannerTop)
 	app.Delete("/api/deletebannertop/:bannertopid", controller.DeleteBannerTop)
+
+	app.Post("/api/addimages/", controller.AddImage)
+	app.Get("/api/getimages/:imagetype/:id", controller.GetImage)
 
 	app.Listen(":8080")
 

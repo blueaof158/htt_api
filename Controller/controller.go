@@ -22,7 +22,20 @@ func GetCarTypes(c *fiber.Ctx) error {
 		"message": msg,
 	})
 }
-
+func GetCarTypesLst(c *fiber.Ctx) error {
+	data, err, msg := services.GetCarTypesLst()
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
 func GetCarType(c *fiber.Ctx) error {
 	data, err, msg := services.GetCarType(c)
 	if err != nil {
@@ -195,7 +208,7 @@ func GetCar(c *fiber.Ctx) error {
 }
 
 func AddCar(c *fiber.Ctx) error {
-	data, err, msg := services.GetCar(c)
+	data, err, msg := services.AddCar(c)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  fiber.StatusBadRequest,
@@ -474,3 +487,32 @@ func DeleteBannerTop(c *fiber.Ctx) error {
 }
 
 // ## BannerTop
+
+func AddImage(c *fiber.Ctx) error {
+	err, msg := services.AddImage(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
+
+func GetImage(c *fiber.Ctx) error {
+	data, err, msg := services.GetImage(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}

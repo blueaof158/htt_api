@@ -2,7 +2,11 @@ package services
 
 import (
 	database "HTTApi/Database"
+	global "HTTApi/Global"
+
+	constant "HTTApi/Constant"
 	model "HTTApi/Model"
+	"database/sql"
 	"strconv"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -14,19 +18,50 @@ var db, err = database.ConnectDB()
 // ## CarType
 func GetCarTypes() ([]model.CarType, error, string) {
 	var cartypes []model.CarType
-	rows, err := db.Query("SELECT CarTypeID,CarTypeName,CarTypeDesctiption,CarTypeInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM CarType;")
+	rows, err := db.Query("SELECT car.CarTypeID, car.CarTypeName, car.CarTypeDesctiption, car.CarTypeInactive, img.ImagePath, car.CreateBy, car.CreateDate, car.UpdateBy, car.UpdateDate FROM CarType car LEFT JOIN Images img ON car.CarTypeID = img.CarTypeID")
 	if err != nil {
 		return nil, err, err.Error()
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var cartype model.CarType
-		err = rows.Scan(&cartype.CarTypeID, &cartype.CarTypeName, &cartype.CarTypeDesctiption, &cartype.CarTypeInactive, &cartype.CreateBy, &cartype.CreateDate, &cartype.UpdateBy, &cartype.UpdateDate)
+		var imagePath sql.NullString
+		err := rows.Scan(&cartype.CarTypeID, &cartype.CarTypeName, &cartype.CarTypeDesctiption, &cartype.CarTypeInactive, &imagePath, &cartype.CreateBy, &cartype.CreateDate, &cartype.UpdateBy, &cartype.UpdateDate)
 		if err != nil {
 			return nil, err, err.Error()
 		}
+		if imagePath.Valid {
+			cartype.Image64 = imagePath.String
+		} else {
+			cartype.Image64 = ""
+		}
 		cartypes = append(cartypes, cartype)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err, err.Error()
+	}
 	return cartypes, nil, "success"
+}
+
+func GetCarTypesLst() ([]model.CarTypeLst, error, string) {
+	var cartypeslst []model.CarTypeLst
+	rows, err := db.Query("SELECT CarTypeID, CarTypeName FROM CarType")
+	if err != nil {
+		return nil, err, err.Error()
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var cartype model.CarTypeLst
+		err := rows.Scan(&cartype.CarTypeID, &cartype.CarTypeName)
+		if err != nil {
+			return nil, err, err.Error()
+		}
+		cartypeslst = append(cartypeslst, cartype)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err, err.Error()
+	}
+	return cartypeslst, nil, "success"
 }
 
 func GetCarType(c *fiber.Ctx) (model.CarType, error, string) {
@@ -34,12 +69,12 @@ func GetCarType(c *fiber.Ctx) (model.CarType, error, string) {
 	if err != nil {
 		return model.CarType{}, err, err.Error()
 	}
-	var result model.CarType
-	err = db.QueryRow("SELECT CarTypeID,CarTypeName,CarTypeDesctiption,CarTypeInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM CarType WHERE CarTypeID = ?;", id).Scan(&result.CarTypeID, &result.CarTypeName, &result.CarTypeDesctiption, &result.CarTypeInactive, &result.CreateBy, &result.CreateDate, &result.UpdateBy, &result.UpdateDate)
+	var cartype model.CarType
+	err = db.QueryRow("SELECT car.CarTypeID,car.CarTypeName,car.CarTypeDesctiption,car.CarTypeInactive,img.ImagePath,car.CreateBy,car.CreateDate,car.UpdateBy,car.UpdateDate FROM CarType car LEFT JOIN Images img ON car.CarTypeID = img.CarTypeID WHERE car.CarTypeID = ?;", id).Scan(&cartype.CarTypeID, &cartype.CarTypeName, &cartype.CarTypeDesctiption, &cartype.CarTypeInactive, &cartype.Image64, &cartype.CreateBy, &cartype.CreateDate, &cartype.UpdateBy, &cartype.UpdateDate)
 	if err != nil {
 		return model.CarType{}, err, err.Error()
 	}
-	return result, nil, "success"
+	return cartype, nil, "success"
 }
 
 func AddCarType(c *fiber.Ctx) (model.CarType, error, string) {
@@ -59,7 +94,8 @@ func AddCarType(c *fiber.Ctx) (model.CarType, error, string) {
 	if err != nil {
 		return model.CarType{}, err, err.Error()
 	}
-	lastInsertID, err := result.LastInsertId()
+	lastInsertID, _ := result.LastInsertId()
+	err = global.InsertImage(cartype.Image64, lastInsertID, constant.CarTypeImage)
 	if err != nil {
 		return model.CarType{}, err, "can't get id"
 	}
@@ -90,6 +126,19 @@ func UpdateCarType(c *fiber.Ctx) (model.CarType, error, string) {
 		cartype.CarTypeInactive,
 		cartypeid,
 	)
+	if err != nil {
+		return model.CarType{}, err, err.Error()
+	}
+
+	err = global.DeleteImage(int64(cartypeid), constant.CarTypeImage)
+	if err != nil {
+		return model.CarType{}, err, err.Error()
+	}
+	err = global.InsertImage(cartype.Image64, int64(cartypeid), constant.CarTypeImage)
+	if err != nil {
+		return model.CarType{}, err, err.Error()
+	}
+
 	if err != nil {
 		return model.CarType{}, err, err.Error()
 	}
@@ -235,14 +284,16 @@ func DeleteAward(c *fiber.Ctx) (model.CarType, error, string) {
 // ## Car
 func GetCars() ([]model.Car, error, string) {
 	var cars []model.Car
-	query := "SELECT CarID,CarName,CarDesctiption,CarTypeID,CarInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Car;"
+	// query := "SELECT CarID,CarName,CarDesctiption,CarTypeID,CarInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Car;"
+	query := "SELECT car.*,img.ImagePath,cartype.CarTypeName FROM Car car LEFT JOIN Images img ON car.CarID = img.CarID LEFT JOIN CarType cartype ON car.CarTypeID = cartype.CarTypeID ORDER BY img.ImagesID LIMIT 1;"
+
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err, err.Error()
 	}
 	for rows.Next() {
 		var car model.Car
-		err = rows.Scan(&car.CarID, &car.CarName, &car.CarDesctiption, &car.CarTypeID, &car.CarInactive, &car.CreateBy, &car.CreateDate, &car.UpdateBy, &car.UpdateDate)
+		err = rows.Scan(&car.CarID, &car.CarName, &car.CarDesctiption, &car.CarTypeID, &car.CarInactive, &car.CreateBy, &car.CreateDate, &car.UpdateBy, &car.UpdateDate, &car.Image64, &car.CarTypeName)
 		if err != nil {
 			return nil, err, err.Error()
 		}
@@ -254,7 +305,7 @@ func GetCars() ([]model.Car, error, string) {
 func GetCar(c *fiber.Ctx) (model.Car, error, string) {
 	id, err := strconv.Atoi(c.Params("carid"))
 	var result model.Car
-	err = db.QueryRow("SELECT CarID,CarName,CarDesctiption,CarTypeID,CarInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Car CarID = ?;", id).Scan(&result.CarID, &result.CarName, &result.CarDesctiption, &result.CarTypeID, &result.CarInactive, &result.CreateBy, &result.CreateDate, &result.UpdateBy, &result.UpdateDate)
+	err = db.QueryRow("SELECT car.*,img.ImagePath,cartype.CarTypeName FROM Car car LEFT JOIN Images img ON car.CarID = img.CarID LEFT JOIN CarType cartype ON car.CarTypeID = cartype.CarTypeID WHERE car.CarID = ? ORDER BY img.ImagesID  LIMIT 1;", id).Scan(&result.CarID, &result.CarName, &result.CarDesctiption, &result.CarTypeID, &result.CarInactive, &result.CreateBy, &result.CreateDate, &result.UpdateBy, &result.UpdateDate, &result.Image64, &result.CarTypeName)
 	if err != nil {
 		return model.Car{}, err, err.Error()
 	}
@@ -266,13 +317,14 @@ func AddCar(c *fiber.Ctx) (model.Car, error, string) {
 	if err = c.BodyParser(car); err != nil {
 		return model.Car{}, err, err.Error()
 	}
-	stmt, err := db.Prepare("INSERT INTO Car (CarName,CarDesctiption,CarTypeID,CarInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,?,?,User(), NOW(), User(), NOW())")
+	stmt, err := db.Prepare("INSERT INTO Car (CarName,CarDesctiption,CarTypeID,CarInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,?,User(), NOW(), User(), NOW())")
 	if err != nil {
 		return model.Car{}, err, err.Error()
 	}
 	result, err := stmt.Exec(
 		car.CarName,
 		car.CarDesctiption,
+		car.CarTypeID,
 		car.CarInactive,
 	)
 	if err != nil {
@@ -338,6 +390,7 @@ func DeleteCar(c *fiber.Ctx) (model.Car, error, string) {
 	if err != nil {
 		return model.Car{}, err, err.Error()
 	}
+	err = global.DeleteImage(int64(carid), constant.CarImage)
 	return model.Car{}, nil, "success"
 }
 
@@ -580,14 +633,14 @@ func DeleteExecutive(c *fiber.Ctx) (model.Executives, error, string) {
 // ## BannerTop
 func GetBannerTops() ([]model.BannerTop, error, string) {
 	var bannertops []model.BannerTop
-	query := "SELECT BT.BannerTopID,BT.BannerTopImageLink,BT.BannerTopInactive,BT.CreateBy,BT.CreateDate,BT.UpdateBy,BT.UpdateDate,Img.ImagePath FROM Htt.BannerTop BT LEFT JOIN Htt.Images Img ON BT.BannerTopID = Img.BannerTopID;"
+	query := "SELECT BT.BannerTopID,BT.BannerTopImageLink,BT.BannerTopInactive,Img.ImagePath,BT.CreateBy,BT.CreateDate,BT.UpdateBy,BT.UpdateDate FROM Htt.BannerTop BT LEFT JOIN Htt.Images Img ON BT.BannerTopID = Img.BannerTopID;"
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err, err.Error()
 	}
 	for rows.Next() {
 		var bannertop model.BannerTop
-		err = rows.Scan(&bannertop.BannerTopID, &bannertop.ImagePath, &bannertop.BannerTopImageLink, &bannertop.BannerTopInactive, &bannertop.CreateBy, &bannertop.CreateDate, &bannertop.UpdateBy, &bannertop.UpdateDate)
+		err = rows.Scan(&bannertop.BannerTopID, &bannertop.BannerTopImageLink, &bannertop.BannerTopInactive, &bannertop.ImagePath, &bannertop.CreateBy, &bannertop.CreateDate, &bannertop.UpdateBy, &bannertop.UpdateDate)
 		if err != nil {
 			return nil, err, err.Error()
 		}
@@ -600,7 +653,7 @@ func GetBannerTop(c *fiber.Ctx) (model.BannerTop, error, string) {
 	id, err := strconv.Atoi(c.Params("bannertopid"))
 	var bannertop model.BannerTop
 
-	err = db.QueryRow("SELECT BT.BannerTopID,BT.BannerTopImagegPath,BT.BannerTopImageLink,BT.BannerTopInactive,BT.CreateBy,BT.CreateDate,BT.UpdateBy,BT.UpdateDate,IMG.ImagePath FROM Htt.BannerTop BT LEFT JOIN Images Img ON BT.BannerTopID = Img.BannerTopID WHERE BT.BannerTopID = ?;", id).Scan(&bannertop.BannerTopID, &bannertop.ImagePath, &bannertop.BannerTopImageLink, &bannertop.BannerTopInactive, &bannertop.CreateBy, &bannertop.CreateDate, &bannertop.UpdateBy, &bannertop.UpdateDate)
+	err = db.QueryRow("SELECT BT.BannerTopID,BT.BannerTopImageLink,BT.BannerTopInactive,Img.ImagePath,BT.CreateBy,BT.CreateDate,BT.UpdateBy,BT.UpdateDate FROM Htt.BannerTop BT LEFT JOIN Htt.Images Img ON BT.BannerTopID = Img.BannerTopID WHERE BT.BannerTopID = ?;", id).Scan(&bannertop.BannerTopID, &bannertop.BannerTopImageLink, &bannertop.BannerTopInactive, &bannertop.ImagePath, &bannertop.CreateBy, &bannertop.CreateDate, &bannertop.UpdateBy, &bannertop.UpdateDate)
 	// err = db.QueryRow("SELECT BannerTopID,BannerTopImagegPath,BannerTopImageLink,BannerTopInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM BannerTop WHERE ExecutivesID = ?;", id).Scan(&bannertop.BannerTopID, &bannertop.BannerTopImagegPath, &bannertop.BannerTopImageLink, &bannertop.BannerTopInactive, &bannertop.CreateBy, &bannertop.CreateDate, &bannertop.UpdateBy, &bannertop.UpdateDate)
 	if err != nil {
 		return model.BannerTop{}, err, err.Error()
@@ -613,12 +666,11 @@ func AddBannerTop(c *fiber.Ctx) (model.BannerTop, error, string) {
 	if err = c.BodyParser(bannertop); err != nil {
 		return model.BannerTop{}, err, err.Error()
 	}
-	stmt, err := db.Prepare("INSERT INTO BannerTop (BannerTopImagegPath,BannerTopImageLink,BannerTopInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,User(), NOW(), User(), NOW())")
+	stmt, err := db.Prepare("INSERT INTO BannerTop (BannerTopImageLink,BannerTopInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,User(), NOW(), User(), NOW())")
 	if err != nil {
 		return model.BannerTop{}, err, err.Error()
 	}
 	result, err := stmt.Exec(
-		// bannertop.BannerTopImagegPath,
 		bannertop.BannerTopImageLink,
 		bannertop.BannerTopInactive,
 	)
@@ -626,13 +678,12 @@ func AddBannerTop(c *fiber.Ctx) (model.BannerTop, error, string) {
 		return model.BannerTop{}, err, err.Error()
 	}
 	lastInsertID, err := result.LastInsertId()
-
 	if err != nil {
 		return model.BannerTop{}, err, "can't get id"
 	}
+	global.InsertImage(bannertop.ImagePath, int64(lastInsertID), constant.BannerImage)
 	var r model.BannerTop
 	r.BannerTopID = int(lastInsertID)
-	// r.BannerTopImagegPath = bannertop.BannerTopImagegPath
 	r.BannerTopImageLink = bannertop.BannerTopImageLink
 	r.BannerTopInactive = bannertop.BannerTopInactive
 	return r, nil, "success"
@@ -642,28 +693,28 @@ func UpdateBannerTop(c *fiber.Ctx) (model.BannerTop, error, string) {
 	bannertopid, err := strconv.Atoi(c.Params("bannertopid"))
 	content := new(model.BannerTop)
 	c.BodyParser(content)
-
-	data, err, _ := GetContent(c)
-	if data == (model.Content{}) {
+	data, err, _ := GetBannerTop(c)
+	if data == (model.BannerTop{}) {
 		return model.BannerTop{}, err, err.Error()
 	}
-	stmt, err := db.Prepare("UPDATE BannerTop SET BannerTopImagegPath=?, BannerTopImageLink=?, BannerTopInactive=?, UpdateBy=User(), UpdateDate=NOW() WHERE BannerTopID=?")
+	stmt, err := db.Prepare("UPDATE BannerTop SET BannerTopImageLink=?, BannerTopInactive=?, UpdateBy=User(), UpdateDate=NOW() WHERE BannerTopID=?")
 	if err != nil {
 		return model.BannerTop{}, err, err.Error()
 	}
 	_, err = stmt.Exec(
-		// content.BannerTopImagegPath,
 		content.BannerTopImageLink,
 		content.BannerTopInactive,
 		bannertopid,
 	)
+
 	if err != nil {
 		return model.BannerTop{}, err, err.Error()
 	}
+	global.DeleteImage(int64(bannertopid), constant.BannerImage)
+	global.InsertImage(content.ImagePath, int64(bannertopid), constant.BannerImage)
 
 	var r model.BannerTop
 	r.BannerTopID = bannertopid
-	// r.BannerTopImagegPath = content.BannerTopImagegPath
 	r.BannerTopImageLink = content.BannerTopImageLink
 	r.BannerTopInactive = content.BannerTopInactive
 	return r, nil, "success"
@@ -680,6 +731,7 @@ func DeleteBannerTop(c *fiber.Ctx) (model.BannerTop, error, string) {
 	_, err = stmt.Exec(
 		bannertopid,
 	)
+	global.DeleteImage(int64(bannertopid), constant.BannerImage)
 	if err != nil {
 		return model.BannerTop{}, err, err.Error()
 	}
@@ -804,3 +856,28 @@ func DeleteBannerTop(c *fiber.Ctx) (model.BannerTop, error, string) {
 // }
 
 // ## JobApplications
+
+func AddImage(c *fiber.Ctx) (error, string) {
+	img := new(model.ImageJson)
+	if err = c.BodyParser(img); err != nil {
+		return err, err.Error()
+	}
+	global.DeleteImage(int64(img.Id), img.ImageType)
+	for _, img64 := range img.Image64 {
+		err := global.InsertImage(img64, int64(img.Id), img.ImageType)
+		if err != nil {
+			return err, err.Error()
+		}
+	}
+	return nil, "success"
+}
+
+func GetImage(c *fiber.Ctx) (model.ImageJson, error, string) {
+	id, err := strconv.Atoi(c.Params("id"))
+	imagetype := c.Params("imagetype")
+	data, err := global.GetImages(int64(id), imagetype)
+	if err != nil {
+		return model.ImageJson{}, err, err.Error()
+	}
+	return data, nil, "success"
+}
