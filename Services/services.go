@@ -174,14 +174,14 @@ func DeleteCarType(c *fiber.Ctx) (model.CarType, error, string) {
 // ## Awards
 func GetAwards() ([]model.Award, error, string) {
 	var awards []model.Award
-	query := "SELECT AwardID,AwardName,AwardDescription,AwardInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Award;"
+	query := "SELECT award.*,img.ImagePath FROM Award award LEFT JOIN Images img ON award.AwardID = img.AwardID;"
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err, err.Error()
 	}
 	for rows.Next() {
 		var award model.Award
-		err = rows.Scan(&award.AwardID, &award.AwardName, &award.AwardDescription, &award.AwardInactive, &award.CreateBy, &award.CreateDate, &award.UpdateBy, &award.UpdateDate)
+		err = rows.Scan(&award.AwardID, &award.AwardName, &award.AwardDescription, &award.AwardInactive, &award.CreateBy, &award.CreateDate, &award.UpdateBy, &award.UpdateDate, &award.Image64)
 		if err != nil {
 			return nil, err, err.Error()
 		}
@@ -193,7 +193,7 @@ func GetAwards() ([]model.Award, error, string) {
 func GetAward(c *fiber.Ctx) (model.Award, error, string) {
 	id, err := strconv.Atoi(c.Params("awardid"))
 	var award model.Award
-	err = db.QueryRow("SELECT AwardID,AwardName,AwardDescription,AwardInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Award WHERE AwardID = ?;", id).Scan(&award.AwardID, &award.AwardName, &award.AwardDescription, &award.AwardInactive, &award.CreateBy, &award.CreateDate, &award.UpdateBy, &award.UpdateDate)
+	err = db.QueryRow("SELECT award.*,img.ImagePath FROM Award award LEFT JOIN Images img ON award.AwardID = img.AwardID WHERE award.AwardID = ? ORDER BY img.ImagesID LIMIT 1;", id).Scan(&award.AwardID, &award.AwardName, &award.AwardDescription, &award.AwardInactive, &award.CreateBy, &award.CreateDate, &award.UpdateBy, &award.UpdateDate, &award.Image64)
 
 	if err != nil {
 		return model.Award{}, err, err.Error()
@@ -207,7 +207,7 @@ func AddAward(c *fiber.Ctx) (model.Award, error, string) {
 	if err = c.BodyParser(award); err != nil {
 		return model.Award{}, err, err.Error()
 	}
-	stmt, err := db.Prepare("INSERT INTO Award (AwardName,AwardDescription,AwardInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,?,User(), NOW(), User(), NOW())")
+	stmt, err := db.Prepare("INSERT INTO Award (AwardName,AwardDescription,AwardInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,User(), NOW(), User(), NOW())")
 	if err != nil {
 		return model.Award{}, err, err.Error()
 	}
@@ -223,6 +223,7 @@ func AddAward(c *fiber.Ctx) (model.Award, error, string) {
 	if err != nil {
 		return model.Award{}, err, "can't get id"
 	}
+	global.InsertImage(award.Image64, lastInsertID, constant.AwardImage)
 	var r model.Award
 	r.AwardID = int(lastInsertID)
 	r.AwardName = award.AwardName
@@ -253,7 +254,8 @@ func UpdateAward(c *fiber.Ctx) (model.Award, error, string) {
 	if err != nil {
 		return model.Award{}, err, err.Error()
 	}
-
+	global.DeleteImage(int64(awardid), constant.AwardImage)
+	global.InsertImage(award.Image64, int64(awardid), constant.AwardImage)
 	var r model.Award
 	r.AwardID = awardid
 	r.AwardName = award.AwardName

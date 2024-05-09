@@ -18,7 +18,7 @@ type CarTypeLst struct {
 }
 
 type Award struct {
-	AwardID          int    `json:"awardID"`
+	AwardID          int    `json:"awardid"`
 	AwardName        string `json:"awardname"`
 	AwardDescription string `json:"awarddescription"`
 	AwardInactive    int    `json:"awardInactive"`
@@ -26,6 +26,7 @@ type Award struct {
 	CreateDate       string `json:"createdate"`
 	UpdateBy         string `json:"updateby"`
 	UpdateDate       string `json:"updatedate"`
+	Image64          string `json:"image64"`
 }
 
 type Car struct {
