@@ -488,6 +488,84 @@ func DeleteBannerTop(c *fiber.Ctx) error {
 
 // ## BannerTop
 
+// ## JobApplication
+func GetJobApplications(c *fiber.Ctx) error {
+	data, err, msg := services.GetJobApplications()
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
+
+func GetJobApplication(c *fiber.Ctx) error {
+	data, err, msg := services.GetJobApplication(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
+
+func AddJobApplication(c *fiber.Ctx) error {
+	data, err, msg := services.AddJobApplication(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
+
+func UpdateJobApplication(c *fiber.Ctx) error {
+	data, err, msg := services.UpdateJobApplication(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
+
+func DeleteJobApplication(c *fiber.Ctx) error {
+	data, err, msg := services.DeleteJobApplication(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
+
+// ## JobApplication
+
 func AddImage(c *fiber.Ctx) error {
 	err, msg := services.AddImage(c)
 	if err != nil {

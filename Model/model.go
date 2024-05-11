@@ -34,7 +34,7 @@ type Car struct {
 	CarName        string `json:"carname"`
 	CarDesctiption string `json:"cardesctiption"`
 	CarTypeID      int    `json:"cartypeID"`
-	CarInactive    int    `json:"carInactive"`
+	CarInactive    int    `json:"carinactive"`
 	CreateBy       string `json:"createby"`
 	CreateDate     string `json:"createdate"`
 	UpdateBy       string `json:"updateby"`
@@ -96,7 +96,6 @@ type JobApplications struct {
 	JobApplicationsPosition    string `json:"jobapplicationsposition"`
 	JobApplicationsDescription string `json:"jobapplicationsdescription"`
 	JobApplicationsInactive    int    `json:"jobapplicationsinactive"`
-	JobApplicationFilePath     string `json:"jobapplicationfilepath"`
 	CreateBy                   string `json:"createby"`
 	CreateDate                 string `json:"createdate"`
 	UpdateBy                   string `json:"updateby"`

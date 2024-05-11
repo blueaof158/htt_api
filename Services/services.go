@@ -744,118 +744,114 @@ func DeleteBannerTop(c *fiber.Ctx) (model.BannerTop, error, string) {
 
 // ## JobApplications
 
-// func GetJobApplications() ([]model.JobApplications, error, string) {
-// 	var jobApplications []model.JobApplications
-// 	query := "SELECT JobApplicationsID,JobApplicationsName,JobApplicationsPosition,JobApplicationsDescription,JobApplicationsInactive,JobApplicationFilePath,CreateBy,CreateDate,UpdateBy,UpdateDate FROM JobApplications;"
-// 	rows, err := db.Query(query)
-// 	if err != nil {
-// 		return nil, err, err.Error()
-// 	}
-// 	for rows.Next() {
-// 		var jobApplication model.JobApplications
-// 		err = rows.Scan(&jobApplication.JobApplicationsID, &jobApplication.JobApplicationsName, &jobApplication.JobApplicationsPosition, &jobApplication.JobApplicationsDescription, &jobApplication.JobApplicationsInactive, &jobApplication.JobApplicationFilePath, &jobApplication.CreateBy, &jobApplication.CreateDate, &jobApplication.UpdateBy, &jobApplication.UpdateDate)
-// 		if err != nil {
-// 			return nil, err, err.Error()
-// 		}
-// 		jobApplications = append(jobApplications, jobApplication)
-// 	}
-// 	return jobApplications, nil, "success"
-// }
+func GetJobApplications() ([]model.JobApplications, error, string) {
+	var jobApplications []model.JobApplications
+	query := "SELECT JobApplicationsID,JobApplicationsName,JobApplicationsPosition,JobApplicationsInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM JobApplications;"
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err, err.Error()
+	}
+	for rows.Next() {
+		var jobApplication model.JobApplications
+		err = rows.Scan(&jobApplication.JobApplicationsID, &jobApplication.JobApplicationsName, &jobApplication.JobApplicationsPosition, &jobApplication.JobApplicationsInactive, &jobApplication.CreateBy, &jobApplication.CreateDate, &jobApplication.UpdateBy, &jobApplication.UpdateDate)
+		if err != nil {
+			return nil, err, err.Error()
+		}
+		jobApplications = append(jobApplications, jobApplication)
+	}
+	return jobApplications, nil, "success"
+}
 
-// func GetJobApplication(c *fiber.Ctx) (model.JobApplications, error, string) {
-// 	id, err := strconv.Atoi(c.Params("jobApplicationsid"))
-// 	var jobApplication model.JobApplications
-// 	err = db.QueryRow("SELECT JobApplicationsID,JobApplicationsName,JobApplicationsPosition,JobApplicationsDescription,JobApplicationsInactive,JobApplicationFilePath,CreateBy,CreateDate,UpdateBy,UpdateDate FROM JobApplications WHERE JobApplicationsID = ?;", id).Scan(&jobApplication.JobApplicationsID, &jobApplication.JobApplicationsName, &jobApplication.JobApplicationsPosition, &jobApplication.JobApplicationsDescription, &jobApplication.JobApplicationsInactive, &jobApplication.JobApplicationFilePath, &jobApplication.CreateBy, &jobApplication.CreateDate, &jobApplication.UpdateBy, &jobApplication.UpdateDate)
-// 	if err != nil {
-// 		return model.JobApplications{}, err, err.Error()
-// 	}
-// 	return jobApplication, nil, "success"
-// }
+func GetJobApplication(c *fiber.Ctx) (model.JobApplications, error, string) {
+	id, err := strconv.Atoi(c.Params("jobApplicationsid"))
+	var jobApplication model.JobApplications
+	err = db.QueryRow("SELECT JobApplicationsID,JobApplicationsName,JobApplicationsPosition,JobApplicationsDescription,JobApplicationsInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM JobApplications WHERE JobApplicationsID = ?;", id).Scan(&jobApplication.JobApplicationsID, &jobApplication.JobApplicationsName, &jobApplication.JobApplicationsPosition, &jobApplication.JobApplicationsDescription, &jobApplication.JobApplicationsInactive, &jobApplication.CreateBy, &jobApplication.CreateDate, &jobApplication.UpdateBy, &jobApplication.UpdateDate)
+	if err != nil {
+		return model.JobApplications{}, err, err.Error()
+	}
+	return jobApplication, nil, "success"
+}
 
-// func AddJobApplication(c *fiber.Ctx) (model.JobApplications, error, string) {
-// 	jobApplication := new(model.JobApplications)
-// 	if err = c.BodyParser(jobApplication); err != nil {
-// 		return model.JobApplications{}, err, err.Error()
-// 	}
-// 	stmt, err := db.Prepare("INSERT INTO JobApplications (JobApplicationsName,JobApplicationsPosition,JobApplicationsDescription,JobApplicationsInactive,JobApplicationFilePath,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,?,?,User(), NOW(), User(), NOW())")
-// 	if err != nil {
-// 		return model.JobApplications{}, err, err.Error()
-// 	}
-// 	result, err := stmt.Exec(
-// 		jobApplication.JobApplicationsName,
-// 		jobApplication.ExecutivesLastName,
-// 		jobApplication.ExecutivesPosition,
-// 		jobApplication.ExecutivesBio,
-// 		jobApplication.ExecutivesInactive,
-// 	)
-// 	if err != nil {
-// 		return model.JobApplications{}, err, err.Error()
-// 	}
-// 	lastInsertID, err := result.LastInsertId()
-// 	if err != nil {
-// 		return model.JobApplications{}, err, "can't get id"
-// 	}
-// 	var r model.JobApplications
-// 	r.ExecutivesID = int(lastInsertID)
-// 	r.ExecutivesFirstName = executive.ExecutivesFirstName
-// 	r.ExecutivesLastName = executive.ExecutivesLastName
-// 	r.ExecutivesPosition = executive.ExecutivesPosition
-// 	r.ExecutivesBio = executive.ExecutivesBio
-// 	r.ExecutivesInactive = executive.ExecutivesInactive
-// 	return r, nil, "success"
-// }
+func AddJobApplication(c *fiber.Ctx) (model.JobApplications, error, string) {
+	jobApplication := new(model.JobApplications)
+	if err = c.BodyParser(jobApplication); err != nil {
+		return model.JobApplications{}, err, err.Error()
+	}
+	stmt, err := db.Prepare("INSERT INTO JobApplications (JobApplicationsName,JobApplicationsPosition,JobApplicationsDescription,JobApplicationsInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,?,User(), NOW(), User(), NOW())")
+	if err != nil {
+		return model.JobApplications{}, err, err.Error()
+	}
+	result, err := stmt.Exec(
+		jobApplication.JobApplicationsName,
+		jobApplication.JobApplicationsPosition,
+		jobApplication.JobApplicationsDescription,
+		jobApplication.JobApplicationsInactive,
+	)
+	if err != nil {
+		return model.JobApplications{}, err, err.Error()
+	}
+	lastInsertID, err := result.LastInsertId()
+	if err != nil {
+		return model.JobApplications{}, err, "can't get id"
+	}
+	var r model.JobApplications
+	r.JobApplicationsID = int(lastInsertID)
+	r.JobApplicationsName = jobApplication.JobApplicationsName
+	r.JobApplicationsPosition = jobApplication.JobApplicationsPosition
+	r.JobApplicationsDescription = jobApplication.JobApplicationsDescription
+	r.JobApplicationsInactive = jobApplication.JobApplicationsInactive
+	return r, nil, "success"
+}
 
-// func UpdateJobApplication(c *fiber.Ctx) (model.JobApplications, error, string) {
-// 	jobapplicationsid, err := strconv.Atoi(c.Params("jobapplicationsid"))
-// 	content := new(model.JobApplications)
-// 	c.BodyParser(content)
+func UpdateJobApplication(c *fiber.Ctx) (model.JobApplications, error, string) {
+	jobapplicationsid, err := strconv.Atoi(c.Params("jobapplicationsid"))
+	content := new(model.JobApplications)
+	c.BodyParser(content)
 
-// 	data, err, _ := GetContent(c)
-// 	if data == (model.JobApplications{}) {
-// 		return model.JobApplications{}, err, err.Error()
-// 	}
-// 	stmt, err := db.Prepare("UPDATE Executives SET ExecutivesFirstName=?, ExecutivesLastName=?, ExecutivesPosition=?,ExecutivesBio=?,ExecutivesInactive=?, UpdateBy=User(), UpdateDate=NOW() WHERE ExecutivesID=?")
-// 	if err != nil {
-// 		return model.JobApplications{}, err, err.Error()
-// 	}
-// 	_, err = stmt.Exec(
-// 		content.ExecutivesFirstName,
-// 		content.ExecutivesLastName,
-// 		content.ExecutivesPosition,
-// 		content.ExecutivesBio,
-// 		content.ExecutivesInactive,
-// 		executivesid,
-// 	)
-// 	if err != nil {
-// 		return model.Executives{}, err, err.Error()
-// 	}
+	data, err, _ := GetJobApplication(c)
+	if data == (model.JobApplications{}) {
+		return model.JobApplications{}, err, err.Error()
+	}
+	stmt, err := db.Prepare("UPDATE Executives SET JobApplicationsName=?, JobApplicationsPosition=?, JobApplicationsDescription=?,JobApplicationsInactive=?, UpdateBy=User(), UpdateDate=NOW() WHERE JobApplicationsID=?")
+	if err != nil {
+		return model.JobApplications{}, err, err.Error()
+	}
+	_, err = stmt.Exec(
+		content.JobApplicationsName,
+		content.JobApplicationsPosition,
+		content.JobApplicationsDescription,
+		content.JobApplicationsInactive,
+		jobapplicationsid,
+	)
+	if err != nil {
+		return model.JobApplications{}, err, err.Error()
+	}
 
-// 	var r model.Executives
-// 	r.ExecutivesID = executivesid
-// 	r.ExecutivesFirstName = content.ExecutivesFirstName
-// 	r.ExecutivesLastName = content.ExecutivesLastName
-// 	r.ExecutivesPosition = content.ExecutivesPosition
-// 	r.ExecutivesBio = content.ExecutivesBio
-// 	r.ExecutivesInactive = content.ExecutivesInactive
-// 	return r, nil, "success"
-// }
+	var r model.JobApplications
+	r.JobApplicationsID = jobapplicationsid
+	r.JobApplicationsName = content.JobApplicationsName
+	r.JobApplicationsPosition = content.JobApplicationsPosition
+	r.JobApplicationsDescription = content.JobApplicationsDescription
+	r.JobApplicationsInactive = content.JobApplicationsInactive
+	return r, nil, "success"
+}
 
-// func DeleteExecutive(c *fiber.Ctx) (model.Executives, error, string) {
-// 	executivesid, err := strconv.Atoi(c.Params("executivesid"))
-// 	executiv := new(model.Executives)
-// 	c.BodyParser(executiv)
-// 	stmt, err := db.Prepare("DELETE FROM Executives WHERE ExecutivesID=?")
-// 	if err != nil {
-// 		return model.Executives{}, err, err.Error()
-// 	}
-// 	_, err = stmt.Exec(
-// 		executivesid,
-// 	)
-// 	if err != nil {
-// 		return model.Executives{}, err, err.Error()
-// 	}
-// 	return model.Executives{}, nil, "success"
-// }
+func DeleteJobApplication(c *fiber.Ctx) (model.Executives, error, string) {
+	jobapplicationsid, err := strconv.Atoi(c.Params("jobapplicationsid"))
+	jobapplications := new(model.JobApplications)
+	c.BodyParser(jobapplications)
+	stmt, err := db.Prepare("DELETE FROM JobApplicationsID WHERE JobApplicationsID=?")
+	if err != nil {
+		return model.Executives{}, err, err.Error()
+	}
+	_, err = stmt.Exec(
+		jobapplicationsid,
+	)
+	if err != nil {
+		return model.Executives{}, err, err.Error()
+	}
+	return model.Executives{}, nil, "success"
+}
 
 // ## JobApplications
 

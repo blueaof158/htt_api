@@ -63,6 +63,12 @@ func Route(app *fiber.App) {
 	app.Put("/api/updatebannertop/:bannertopid", controller.UpdateBannerTop)
 	app.Delete("/api/deletebannertop/:bannertopid", controller.DeleteBannerTop)
 
+	app.Get("/api/getjobapplications", controller.GetJobApplications)
+	app.Get("/api/getjobapplication/:jobapplicationsid", controller.GetJobApplication)
+	app.Post("/api/addjobapplication", controller.AddJobApplication)
+	app.Put("/api/updatejobapplication/:jobapplicationsid", controller.UpdateJobApplication)
+	app.Delete("/api/deletejobapplication/:jobapplicationsid", controller.DeleteJobApplication)
+
 	app.Post("/api/addimages/", controller.AddImage)
 	app.Get("/api/getimages/:imagetype/:id", controller.GetImage)
 
