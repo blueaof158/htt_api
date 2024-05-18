@@ -21,6 +21,9 @@ func Route(app *fiber.App) {
 	}))
 	app.Post("/api/login", auth.Login)
 	app.Post("/api/gettoken", getToken)
+
+	app.Get("api/frontend/bannertops", controller.FrontendGetBannerTops)
+
 	// app.Use(auth.CheckMiddleware)
 
 	app.Get("/api/getenv/:name", getEnv)
@@ -34,7 +37,7 @@ func Route(app *fiber.App) {
 
 	app.Get("/api/getawards", controller.GetAwards)
 	app.Get("/api/getaward/:awardid", controller.GetAward)
-	app.Post("/api/addaward/", controller.AddAward)
+	app.Post("/api/addaward", controller.AddAward)
 	app.Put("/api/updateawards/:awardid", controller.UpdateAward)
 	app.Delete("/api/deleteawards/:awardid", controller.DeleteAward)
 	app.Get("/api/updateaward/:awardid", controller.GetAward)
@@ -47,13 +50,13 @@ func Route(app *fiber.App) {
 
 	app.Get("/api/contents", controller.GetContents)
 	app.Get("/api/content/:contentid", controller.GetContent)
-	app.Post("/api/addcontent/:contentid", controller.AddContent)
+	app.Post("/api/addcontent", controller.AddContent)
 	app.Put("/api/updatecontent/:contentid", controller.UpdateContent)
 	app.Delete("/api/deletecontent/:contentid", controller.DeleteContent)
 
 	app.Get("/api/executives", controller.GetExecutives)
 	app.Get("/api/executive/:executivesid", controller.GetExecutive)
-	app.Post("/api/addexecutive/:executivesid", controller.AddExecutive)
+	app.Post("/api/addexecutive", controller.AddExecutive)
 	app.Put("/api/updateexecutive/:executivesid", controller.UpdateExecutive)
 	app.Delete("/api/deleteexecutive/:executivesid", controller.DeleteExecutive)
 
@@ -69,7 +72,27 @@ func Route(app *fiber.App) {
 	app.Put("/api/updatejobapplication/:jobapplicationsid", controller.UpdateJobApplication)
 	app.Delete("/api/deletejobapplication/:jobapplicationsid", controller.DeleteJobApplication)
 
-	app.Post("/api/addimages/", controller.AddImage)
+	app.Get("/api/getusers", controller.GetUsers)
+	app.Get("/api/getuser/:userid", controller.GetUser)
+	app.Post("/api/adduser", controller.AddUser)
+	app.Put("/api/updateuser/:userid", controller.UpdateUser)
+	app.Delete("/api/deleteuser/:userid", controller.DeleteUser)
+
+	app.Post("/api/updateconfig", controller.UpdateConfig)
+	app.Get("/api/getconfig/", controller.GetConfig)
+
+	app.Get("api/frontend/bannertopshtt", controller.FrontendGetBannerTops)
+	app.Get("/api/frontend/getawardshtt", controller.FrontendGetAwards)
+	app.Get("/api/frontend/getconfightt", controller.FrontendGetConfig)
+	app.Get("/api/frontend/getcartypeshtt", controller.FrontendGetCarTypes)
+	app.Get("/api/frontend/getcartypehtt/:cartypeid", controller.FrontendGetCarType)
+	app.Get("/api/frontend/getcontents", controller.FrontendGetContents)
+	app.Get("/api/frontend/getcontent/:contentid", controller.FrontendGetContent)
+	app.Get("/api/frontend/getcars/:cartypeid", controller.FrontendGetCars)
+	app.Get("/api/frontend/getjobshtt", controller.FrontendGetJobApplications)
+	app.Get("/api/frontend/getjobhtt/:jobapplicationsid", controller.FrontendGetJobApplication)
+
+	app.Post("/api/addimages", controller.AddImage)
 	app.Get("/api/getimages/:imagetype/:id", controller.GetImage)
 
 	app.Listen(":8080")

@@ -1,12 +1,12 @@
 package services
 
 import (
+	constant "HTTApi/Constant"
 	database "HTTApi/Database"
 	global "HTTApi/Global"
-
-	constant "HTTApi/Constant"
 	model "HTTApi/Model"
 	"database/sql"
+	"reflect"
 	"strconv"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -153,8 +153,6 @@ func UpdateCarType(c *fiber.Ctx) (model.CarType, error, string) {
 
 func DeleteCarType(c *fiber.Ctx) (model.CarType, error, string) {
 	cartypeid, err := strconv.Atoi(c.Params("cartypeid"))
-	cartype := new(model.CarType)
-	c.BodyParser(cartype)
 	stmt, err := db.Prepare("DELETE FROM  CarType WHERE CarTypeID=?")
 	if err != nil {
 		return model.CarType{}, err, err.Error()
@@ -172,6 +170,25 @@ func DeleteCarType(c *fiber.Ctx) (model.CarType, error, string) {
 // ## CarType
 
 // ## Awards
+func FrontendGetAwards() ([]model.FrontendAward, error, string) {
+	var awards []model.FrontendAward
+	query := "SELECT award.AwardName,award.AwardDescription,img.ImagePath FROM Award award LEFT JOIN Images img ON award.AwardID = img.AwardID WHERE award.AwardInactive != 1;"
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err, err.Error()
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var award model.FrontendAward
+		err = rows.Scan(&award.AwardName, &award.AwardDescription, &award.Image64)
+		if err != nil {
+			return nil, err, err.Error()
+		}
+		awards = append(awards, award)
+	}
+	return awards, nil, "success"
+}
+
 func GetAwards() ([]model.Award, error, string) {
 	var awards []model.Award
 	query := "SELECT award.*,img.ImagePath FROM Award award LEFT JOIN Images img ON award.AwardID = img.AwardID;"
@@ -179,6 +196,7 @@ func GetAwards() ([]model.Award, error, string) {
 	if err != nil {
 		return nil, err, err.Error()
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var award model.Award
 		err = rows.Scan(&award.AwardID, &award.AwardName, &award.AwardDescription, &award.AwardInactive, &award.CreateBy, &award.CreateDate, &award.UpdateBy, &award.UpdateDate, &award.Image64)
@@ -266,8 +284,6 @@ func UpdateAward(c *fiber.Ctx) (model.Award, error, string) {
 
 func DeleteAward(c *fiber.Ctx) (model.CarType, error, string) {
 	awardid, err := strconv.Atoi(c.Params("awardid"))
-	award := new(model.CarType)
-	c.BodyParser(award)
 	stmt, err := db.Prepare("DELETE FROM  Award WHERE AwardID=?")
 	if err != nil {
 		return model.CarType{}, err, err.Error()
@@ -287,12 +303,13 @@ func DeleteAward(c *fiber.Ctx) (model.CarType, error, string) {
 func GetCars() ([]model.Car, error, string) {
 	var cars []model.Car
 	// query := "SELECT CarID,CarName,CarDesctiption,CarTypeID,CarInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Car;"
-	query := "SELECT car.*,img.ImagePath,cartype.CarTypeName FROM Car car LEFT JOIN Images img ON car.CarID = img.CarID LEFT JOIN CarType cartype ON car.CarTypeID = cartype.CarTypeID ORDER BY img.ImagesID LIMIT 1;"
+	query := "SELECT car.*,img.ImagePath,cartype.CarTypeName FROM Car car LEFT JOIN (SELECT * FROM Images img WHERE img.ImagesID = ( SELECT MIN(inner_img.ImagesID) FROM Images inner_img WHERE inner_img.CarID = img.CarID )) img ON car.CarID = img.CarID LEFT JOIN CarType cartype ON car.CarTypeID = cartype.CarTypeID ORDER BY img.ImagesID;"
 
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err, err.Error()
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var car model.Car
 		err = rows.Scan(&car.CarID, &car.CarName, &car.CarDesctiption, &car.CarTypeID, &car.CarInactive, &car.CreateBy, &car.CreateDate, &car.UpdateBy, &car.UpdateDate, &car.Image64, &car.CarTypeName)
@@ -380,8 +397,6 @@ func UpdateCar(c *fiber.Ctx) (model.Car, error, string) {
 
 func DeleteCar(c *fiber.Ctx) (model.Car, error, string) {
 	carid, err := strconv.Atoi(c.Params("carid"))
-	car := new(model.Car)
-	c.BodyParser(car)
 	stmt, err := db.Prepare("DELETE FROM Car WHERE CarID=?")
 	if err != nil {
 		return model.Car{}, err, err.Error()
@@ -402,14 +417,15 @@ func DeleteCar(c *fiber.Ctx) (model.Car, error, string) {
 
 func GetContents() ([]model.Content, error, string) {
 	var contents []model.Content
-	query := "SELECT ContentID,ContentTitle,HyphenationTitle,ContentText,Content,ContentInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Content;"
+	query := "SELECT c.* , i.ImagePath FROM Content c LEFT JOIN Images i ON c.ContentID = i.ContentID;"
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err, err.Error()
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var content model.Content
-		err = rows.Scan(&content.ContentID, &content.ContentTitle, &content.HyphenationTitle, &content.ContentText, &content.Content, &content.ContentInactive, &content.CreateBy, &content.CreateDate, &content.UpdateBy, &content.UpdateDate)
+		err = rows.Scan(&content.ContentID, &content.ContentTitle, &content.ContentText, &content.Content, &content.ContentInactive, &content.CreateBy, &content.CreateDate, &content.UpdateBy, &content.UpdateDate, &content.Image64)
 		if err != nil {
 			return nil, err, err.Error()
 		}
@@ -419,9 +435,9 @@ func GetContents() ([]model.Content, error, string) {
 }
 
 func GetContent(c *fiber.Ctx) (model.Content, error, string) {
-	id, err := strconv.Atoi(c.Params("carid"))
+	id, err := strconv.Atoi(c.Params("contentid"))
 	var content model.Content
-	err = db.QueryRow("SELECT ContentID,ContentTitle,HyphenationTitle,ContentText,Content,ContentInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM Content ContentID = ?;", id).Scan(&content.ContentID, &content.ContentTitle, &content.HyphenationTitle, &content.ContentText, &content.Content, &content.ContentInactive, &content.CreateBy, &content.CreateDate, &content.UpdateBy, &content.UpdateDate)
+	err = db.QueryRow("SELECT c.* , i.ImagePath FROM Content c LEFT JOIN Images i ON c.ContentID = i.ContentID WHERE c.ContentID = ? LIMIT 1;", id).Scan(&content.ContentID, &content.ContentTitle, &content.ContentText, &content.Content, &content.ContentInactive, &content.CreateBy, &content.CreateDate, &content.UpdateBy, &content.UpdateDate, &content.Image64)
 	if err != nil {
 		return model.Content{}, err, err.Error()
 	}
@@ -433,13 +449,12 @@ func AddContent(c *fiber.Ctx) (model.Content, error, string) {
 	if err = c.BodyParser(content); err != nil {
 		return model.Content{}, err, err.Error()
 	}
-	stmt, err := db.Prepare("INSERT INTO Content (ContentTitle,HyphenationTitle,ContentText,Content,ContentInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,?,?,?,User(), NOW(), User(), NOW())")
+	stmt, err := db.Prepare("INSERT INTO Content (ContentTitle,ContentText,Content,ContentInactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,?,User(), NOW(), User(), NOW())")
 	if err != nil {
 		return model.Content{}, err, err.Error()
 	}
 	result, err := stmt.Exec(
 		content.ContentTitle,
-		content.HyphenationTitle,
 		content.ContentText,
 		content.Content,
 		content.ContentInactive,
@@ -451,10 +466,11 @@ func AddContent(c *fiber.Ctx) (model.Content, error, string) {
 	if err != nil {
 		return model.Content{}, err, "can't get id"
 	}
+
+	global.InsertImage(content.Image64, int64(lastInsertID), constant.ContentImage)
 	var r model.Content
 	r.ContentID = int(lastInsertID)
 	r.ContentTitle = content.ContentTitle
-	r.HyphenationTitle = content.HyphenationTitle
 	r.ContentText = content.ContentText
 	r.Content = content.Content
 	r.ContentInactive = content.ContentInactive
@@ -470,13 +486,12 @@ func UpdateContent(c *fiber.Ctx) (model.Content, error, string) {
 	if data == (model.Content{}) {
 		return model.Content{}, err, err.Error()
 	}
-	stmt, err := db.Prepare("UPDATE Content SET ContentTitle=?, HyphenationTitle=?, ContentText=?,Content=?,ContentInactive=?, UpdateBy=User(), UpdateDate=NOW() WHERE ContentID=?")
+	stmt, err := db.Prepare("UPDATE Content SET ContentTitle=?, ContentText=?,Content=?,ContentInactive=?, UpdateBy=User(), UpdateDate=NOW() WHERE ContentID=?")
 	if err != nil {
 		return model.Content{}, err, err.Error()
 	}
 	_, err = stmt.Exec(
 		content.ContentTitle,
-		content.HyphenationTitle,
 		content.ContentText,
 		content.Content,
 		content.ContentInactive,
@@ -485,6 +500,8 @@ func UpdateContent(c *fiber.Ctx) (model.Content, error, string) {
 	if err != nil {
 		return model.Content{}, err, err.Error()
 	}
+	global.DeleteImage(int64(contentid), constant.ContentImage)
+	global.InsertImage(content.Image64, int64(contentid), constant.ContentImage)
 
 	var r model.Content
 	r.ContentID = contentid
@@ -498,8 +515,6 @@ func UpdateContent(c *fiber.Ctx) (model.Content, error, string) {
 
 func DeleteContent(c *fiber.Ctx) (model.Content, error, string) {
 	contentid, err := strconv.Atoi(c.Params("contentid"))
-	content := new(model.Content)
-	c.BodyParser(content)
 	stmt, err := db.Prepare("DELETE FROM Content WHERE ContentID=?")
 	if err != nil {
 		return model.Content{}, err, err.Error()
@@ -507,6 +522,7 @@ func DeleteContent(c *fiber.Ctx) (model.Content, error, string) {
 	_, err = stmt.Exec(
 		contentid,
 	)
+	global.DeleteImage(int64(contentid), constant.ContentImage)
 	if err != nil {
 		return model.Content{}, err, err.Error()
 	}
@@ -524,6 +540,7 @@ func GetExecutives() ([]model.Executives, error, string) {
 	if err != nil {
 		return nil, err, err.Error()
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var executive model.Executives
 		err = rows.Scan(&executive.ExecutivesID, &executive.ExecutivesFirstName, &executive.ExecutivesLastName, &executive.ExecutivesPosition, &executive.ExecutivesBio, &executive.ExecutivesInactive, &executive.CreateBy, &executive.CreateDate, &executive.UpdateBy, &executive.UpdateDate)
@@ -582,9 +599,8 @@ func UpdateExecutive(c *fiber.Ctx) (model.Executives, error, string) {
 	executivesid, err := strconv.Atoi(c.Params("executivesid"))
 	content := new(model.Executives)
 	c.BodyParser(content)
-
-	data, err, _ := GetContent(c)
-	if data == (model.Content{}) {
+	data, err, _ := GetExecutive(c)
+	if data == (model.Executives{}) {
 		return model.Executives{}, err, err.Error()
 	}
 	stmt, err := db.Prepare("UPDATE Executives SET ExecutivesFirstName=?, ExecutivesLastName=?, ExecutivesPosition=?,ExecutivesBio=?,ExecutivesInactive=?, UpdateBy=User(), UpdateDate=NOW() WHERE ExecutivesID=?")
@@ -597,8 +613,7 @@ func UpdateExecutive(c *fiber.Ctx) (model.Executives, error, string) {
 		content.ExecutivesPosition,
 		content.ExecutivesBio,
 		content.ExecutivesInactive,
-		executivesid,
-	)
+		executivesid)
 	if err != nil {
 		return model.Executives{}, err, err.Error()
 	}
@@ -615,8 +630,6 @@ func UpdateExecutive(c *fiber.Ctx) (model.Executives, error, string) {
 
 func DeleteExecutive(c *fiber.Ctx) (model.Executives, error, string) {
 	executivesid, err := strconv.Atoi(c.Params("executivesid"))
-	executiv := new(model.Executives)
-	c.BodyParser(executiv)
 	stmt, err := db.Prepare("DELETE FROM Executives WHERE ExecutivesID=?")
 	if err != nil {
 		return model.Executives{}, err, err.Error()
@@ -633,13 +646,33 @@ func DeleteExecutive(c *fiber.Ctx) (model.Executives, error, string) {
 // ## Executives
 
 // ## BannerTop
-func GetBannerTops() ([]model.BannerTop, error, string) {
-	var bannertops []model.BannerTop
-	query := "SELECT BT.BannerTopID,BT.BannerTopImageLink,BT.BannerTopInactive,Img.ImagePath,BT.CreateBy,BT.CreateDate,BT.UpdateBy,BT.UpdateDate FROM Htt.BannerTop BT LEFT JOIN Htt.Images Img ON BT.BannerTopID = Img.BannerTopID;"
+func FrontendGetBannerTops() ([]model.FrontendBannerTop, error, string) {
+	var bannertops []model.FrontendBannerTop
+	query := "SELECT BT.BannerTopImageLink,Img.ImagePath FROM Htt.BannerTop BT LEFT JOIN Htt.Images Img ON BT.BannerTopID = Img.BannerTopID WHERE BT.BannerTopInactive = 0;"
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err, err.Error()
 	}
+	defer rows.Close()
+	for rows.Next() {
+		var bannertop model.FrontendBannerTop
+		err = rows.Scan(&bannertop.BannerTopImageLink, &bannertop.ImagePath)
+		if err != nil {
+			return nil, err, err.Error()
+		}
+		bannertops = append(bannertops, bannertop)
+	}
+	return bannertops, nil, "success"
+}
+
+func GetBannerTops() ([]model.BannerTop, error, string) {
+	var bannertops []model.BannerTop
+	query := "SELECT BT.BannerTopID,BT.BannerTopImageLink,BT.BannerTopInactive,Img.ImagePath,BT.CreateBy,BT.CreateDate,BT.UpdateBy,BT.UpdateDate FROM Htt.BannerTop BT LEFT JOIN Htt.Images Img ON BT.BannerTopID = Img.BannerTopID ORDER BY BT.BannerTopID ASC;"
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err, err.Error()
+	}
+	defer rows.Close()
 	for rows.Next() {
 		var bannertop model.BannerTop
 		err = rows.Scan(&bannertop.BannerTopID, &bannertop.BannerTopImageLink, &bannertop.BannerTopInactive, &bannertop.ImagePath, &bannertop.CreateBy, &bannertop.CreateDate, &bannertop.UpdateBy, &bannertop.UpdateDate)
@@ -724,8 +757,6 @@ func UpdateBannerTop(c *fiber.Ctx) (model.BannerTop, error, string) {
 
 func DeleteBannerTop(c *fiber.Ctx) (model.BannerTop, error, string) {
 	bannertopid, err := strconv.Atoi(c.Params("bannertopid"))
-	executiv := new(model.Executives)
-	c.BodyParser(executiv)
 	stmt, err := db.Prepare("DELETE FROM BannerTop WHERE BannerTopID=?")
 	if err != nil {
 		return model.BannerTop{}, err, err.Error()
@@ -751,6 +782,7 @@ func GetJobApplications() ([]model.JobApplications, error, string) {
 	if err != nil {
 		return nil, err, err.Error()
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var jobApplication model.JobApplications
 		err = rows.Scan(&jobApplication.JobApplicationsID, &jobApplication.JobApplicationsName, &jobApplication.JobApplicationsPosition, &jobApplication.JobApplicationsInactive, &jobApplication.CreateBy, &jobApplication.CreateDate, &jobApplication.UpdateBy, &jobApplication.UpdateDate)
@@ -812,7 +844,7 @@ func UpdateJobApplication(c *fiber.Ctx) (model.JobApplications, error, string) {
 	if data == (model.JobApplications{}) {
 		return model.JobApplications{}, err, err.Error()
 	}
-	stmt, err := db.Prepare("UPDATE Executives SET JobApplicationsName=?, JobApplicationsPosition=?, JobApplicationsDescription=?,JobApplicationsInactive=?, UpdateBy=User(), UpdateDate=NOW() WHERE JobApplicationsID=?")
+	stmt, err := db.Prepare("UPDATE JobApplications SET JobApplicationsName=?, JobApplicationsPosition=?, JobApplicationsDescription=?,JobApplicationsInactive=?, UpdateBy=User(), UpdateDate=NOW() WHERE JobApplicationsID=?")
 	if err != nil {
 		return model.JobApplications{}, err, err.Error()
 	}
@@ -836,24 +868,127 @@ func UpdateJobApplication(c *fiber.Ctx) (model.JobApplications, error, string) {
 	return r, nil, "success"
 }
 
-func DeleteJobApplication(c *fiber.Ctx) (model.Executives, error, string) {
+func DeleteJobApplication(c *fiber.Ctx) (model.JobApplications, error, string) {
 	jobapplicationsid, err := strconv.Atoi(c.Params("jobapplicationsid"))
-	jobapplications := new(model.JobApplications)
-	c.BodyParser(jobapplications)
-	stmt, err := db.Prepare("DELETE FROM JobApplicationsID WHERE JobApplicationsID=?")
+	stmt, err := db.Prepare("DELETE FROM JobApplications WHERE JobApplicationsID=?")
 	if err != nil {
-		return model.Executives{}, err, err.Error()
+		return model.JobApplications{}, err, err.Error()
 	}
 	_, err = stmt.Exec(
 		jobapplicationsid,
 	)
 	if err != nil {
-		return model.Executives{}, err, err.Error()
+		return model.JobApplications{}, err, err.Error()
 	}
-	return model.Executives{}, nil, "success"
+	return model.JobApplications{}, nil, "success"
 }
 
 // ## JobApplications
+
+// ## User
+
+func GetUsers() ([]model.User, error, string) {
+	var users []model.User
+	query := "SELECT UserID,User,Password,Inactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM User;"
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err, err.Error()
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var user model.User
+		err = rows.Scan(&user.UserID, &user.User, &user.Password, &user.Inactive, &user.CreateBy, &user.CreateDate, &user.UpdateBy, &user.UpdateDate)
+		if err != nil {
+			return nil, err, err.Error()
+		}
+		users = append(users, user)
+	}
+	return users, nil, "success"
+}
+
+func GetUser(c *fiber.Ctx) (model.User, error, string) {
+	id, err := strconv.Atoi(c.Params("userid"))
+	var user model.User
+	err = db.QueryRow("SELECT UserID,User,Inactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM User WHERE UserID = ?;", id).Scan(&user.UserID, &user.User, &user.Inactive, &user.CreateBy, &user.CreateDate, &user.UpdateBy, &user.UpdateDate)
+	if err != nil {
+		return model.User{}, err, err.Error()
+	}
+	return user, nil, "success"
+}
+
+func AddUser(c *fiber.Ctx) (model.User, error, string) {
+	user := new(model.User)
+	if err = c.BodyParser(user); err != nil {
+		return model.User{}, err, err.Error()
+	}
+	stmt, err := db.Prepare("INSERT INTO User (User,Password,Inactive,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,?,User(), NOW(), User(), NOW())")
+	if err != nil {
+		return model.User{}, err, err.Error()
+	}
+	password, _ := global.HashPassword(user.Password)
+	result, err := stmt.Exec(
+		user.User,
+		password,
+		user.Inactive,
+	)
+	if err != nil {
+		return model.User{}, err, err.Error()
+	}
+	lastInsertID, err := result.LastInsertId()
+	if err != nil {
+		return model.User{}, err, "can't get id"
+	}
+	var r model.User
+	r.UserID = int(lastInsertID)
+	r.User = user.User
+	r.Inactive = user.Inactive
+	return r, nil, "success"
+}
+
+func UpdateUser(c *fiber.Ctx) (model.User, error, string) {
+	userid, err := strconv.Atoi(c.Params("userid"))
+	content := new(model.User)
+	c.BodyParser(content)
+
+	data, err, _ := GetUser(c)
+	if data == (model.User{}) {
+		return model.User{}, err, err.Error()
+	}
+	password, _ := global.HashPassword(content.Password)
+	stmt, err := db.Prepare("UPDATE User SET Password=?, Inactive=? WHERE UserID=?")
+	if err != nil {
+		return model.User{}, err, err.Error()
+	}
+	_, err = stmt.Exec(
+		password,
+		content.Inactive,
+		userid,
+	)
+	if err != nil {
+		return model.User{}, err, err.Error()
+	}
+	var r model.User
+	r.UserID = userid
+	r.Inactive = content.Inactive
+	return r, nil, "success"
+}
+
+func DeleteUser(c *fiber.Ctx) (model.User, error, string) {
+	userid, err := strconv.Atoi(c.Params("userid"))
+	stmt, err := db.Prepare("DELETE FROM User WHERE UserID=?")
+	if err != nil {
+		return model.User{}, err, err.Error()
+	}
+	_, err = stmt.Exec(
+		userid,
+	)
+	if err != nil {
+		return model.User{}, err, err.Error()
+	}
+	return model.User{}, nil, "success"
+}
+
+// ## User
 
 func AddImage(c *fiber.Ctx) (error, string) {
 	img := new(model.ImageJson)
@@ -864,6 +999,7 @@ func AddImage(c *fiber.Ctx) (error, string) {
 	for _, img64 := range img.Image64 {
 		err := global.InsertImage(img64, int64(img.Id), img.ImageType)
 		if err != nil {
+			global.DeleteImage(int64(img.Id), img.ImageType)
 			return err, err.Error()
 		}
 	}
@@ -878,4 +1014,227 @@ func GetImage(c *fiber.Ctx) (model.ImageJson, error, string) {
 		return model.ImageJson{}, err, err.Error()
 	}
 	return data, nil, "success"
+}
+
+func UpdateConfig(c *fiber.Ctx) (error, string) {
+	companyInfo := new(model.CompanyInfo)
+	if err = c.BodyParser(companyInfo); err != nil {
+		return err, err.Error()
+	}
+	err, errstring := global.DeleteConfig()
+	if err != nil {
+		return err, errstring
+	}
+	global.AddConfig("Advise", companyInfo.Advise)
+	global.AddConfig("CompanyAddress", companyInfo.CompanyAddress)
+	global.AddConfig("CompanyName", companyInfo.CompanyName)
+	global.AddConfig("ContactUs", companyInfo.ContactUs)
+	global.AddConfig("AboutUs", companyInfo.AboutUs)
+	global.AddConfig("Image641", companyInfo.Image641)
+	global.AddConfig("Image642", companyInfo.Image642)
+	global.AddConfig("Image643", companyInfo.Image643)
+	global.AddConfig("JuristicID", companyInfo.JuristicID)
+	global.AddConfig("OurService", companyInfo.OurService)
+	global.AddConfig("ServiceLocation", companyInfo.ServiceLocation)
+	global.AddConfig("WhyUseUs1", companyInfo.WhyUseUs1)
+	global.AddConfig("WhyUseUs2", companyInfo.WhyUseUs2)
+	global.AddConfig("WhyUseUs3", companyInfo.WhyUseUs3)
+	global.AddConfig("WhyUseUsTitl1", companyInfo.WhyUseUsTitl1)
+	global.AddConfig("WhyUseUsTitl2", companyInfo.WhyUseUsTitl2)
+	global.AddConfig("WhyUseUsTitl3", companyInfo.WhyUseUsTitl3)
+	global.AddConfig("ContactNumber", companyInfo.ContactNumber)
+	global.AddConfig("FacebookLink", companyInfo.FacebookLink)
+	global.AddConfig("LineLink", companyInfo.LineLink)
+	global.AddConfig("GoogleMap", companyInfo.GoogleMap)
+
+	return nil, "success"
+}
+
+func GetConfig(c *fiber.Ctx) (model.CompanyInfo, error, string) {
+	// configname, err := strconv.Atoi(c.Params("configname"))
+	var companyInfo model.CompanyInfo
+	rows, err := db.Query("SELECT ConfigName, Value FROM OtherConfigs ;")
+	if err != nil {
+		return model.CompanyInfo{}, err, err.Error()
+	}
+	v := reflect.ValueOf(&companyInfo).Elem()
+	t := v.Type()
+	defer rows.Close()
+	for rows.Next() {
+		var configName, value string
+		if err := rows.Scan(&configName, &value); err != nil {
+			return model.CompanyInfo{}, err, err.Error()
+		}
+		// Find the corresponding field in the struct
+		for i := 0; i < t.NumField(); i++ {
+			field := t.Field(i)
+			if field.Name == configName {
+				v.FieldByName(field.Name).SetString(value)
+				break
+			}
+		}
+	}
+	// Check for any errors encountered during iteration
+	if err := rows.Err(); err != nil {
+		return model.CompanyInfo{}, err, err.Error()
+	}
+	return companyInfo, nil, "success"
+}
+
+func FrontendGetConfig(c *fiber.Ctx) (model.CompanyInfo, error, string) {
+	var companyInfo model.CompanyInfo
+	rows, err := db.Query("SELECT ConfigName, Value FROM OtherConfigs;")
+	if err != nil {
+		return model.CompanyInfo{}, err, err.Error()
+	}
+	v := reflect.ValueOf(&companyInfo).Elem()
+	t := v.Type()
+	defer rows.Close()
+	for rows.Next() {
+		var configName, value string
+		if err := rows.Scan(&configName, &value); err != nil {
+			return model.CompanyInfo{}, err, err.Error()
+		}
+		for i := 0; i < t.NumField(); i++ {
+			field := t.Field(i)
+			if field.Name == configName {
+				v.FieldByName(field.Name).SetString(value)
+				break
+			}
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return model.CompanyInfo{}, err, err.Error()
+	}
+	return companyInfo, nil, "success"
+}
+
+func FrontendGetCarTypes(c *fiber.Ctx) ([]model.FrontendCarType, error, string) {
+	var cartypes []model.FrontendCarType
+	rows, err := db.Query("SELECT car.CarTypeID, car.CarTypeName, car.CarTypeDesctiption, car.CarTypeInactive, img.ImagePath FROM CarType car LEFT JOIN Images img ON car.CarTypeID = img.CarTypeID WHERE car.CarTypeInactive = 0")
+	if err != nil {
+		return nil, err, err.Error()
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var cartype model.FrontendCarType
+		var imagePath sql.NullString
+		err := rows.Scan(&cartype.CarTypeID, &cartype.CarTypeName, &cartype.CarTypeDesctiption, &cartype.CarTypeInactive, &imagePath)
+		if err != nil {
+			return nil, err, err.Error()
+		}
+		if imagePath.Valid {
+			cartype.Image64 = imagePath.String
+		} else {
+			cartype.Image64 = ""
+		}
+		cartypes = append(cartypes, cartype)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err, err.Error()
+	}
+	return cartypes, nil, "success"
+}
+
+func FrontendGetContents(c *fiber.Ctx) ([]model.FrontendContent, error, string) {
+	var contents []model.FrontendContent
+	query := "SELECT c.ContentID,c.ContentTitle,c.ContentText , c.Content, i.ImagePath , c.CreateDate FROM Content c LEFT JOIN Images i ON c.ContentID = i.ContentID WHERE c.ContentInactive = 0 ORDER BY c.ContentID DESC;"
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err, err.Error()
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var content model.FrontendContent
+		err = rows.Scan(&content.ContentID, &content.ContentTitle, &content.ContentText, &content.Content, &content.Image64, &content.CreateDate)
+		if err != nil {
+			return nil, err, err.Error()
+		}
+		contents = append(contents, content)
+	}
+	return contents, nil, "success"
+}
+
+func FrontendGetContent(c *fiber.Ctx) (model.FrontendContent, error, string) {
+	id, err := strconv.Atoi(c.Params("contentid"))
+	if err != nil {
+		return model.FrontendContent{}, err, err.Error()
+	}
+	var content model.FrontendContent
+	err = db.QueryRow("SELECT c.ContentID,c.ContentTitle,c.ContentText , c.Content, i.ImagePath , c.CreateDate FROM Content c LEFT JOIN Images i ON c.ContentID = i.ContentID WHERE c.ContentID = ?;", id).Scan(&content.ContentID, &content.ContentTitle, &content.ContentText, &content.Content, &content.Image64, &content.CreateDate)
+	if err != nil {
+		return model.FrontendContent{}, err, err.Error()
+	}
+	return content, nil, "success"
+}
+
+func FrontendGetCarType(c *fiber.Ctx) (model.FrontendCarType, error, string) {
+	id, err := strconv.Atoi(c.Params("cartypeid"))
+	if err != nil {
+		return model.FrontendCarType{}, err, err.Error()
+	}
+	var cartype model.FrontendCarType
+	err = db.QueryRow("SELECT car.CarTypeID,car.CarTypeName,car.CarTypeDesctiption,img.ImagePath FROM CarType car LEFT JOIN Images img ON car.CarTypeID = img.CarTypeID WHERE  car.CarTypeInactive = 0 AND car.CarTypeID = ?;", id).Scan(&cartype.CarTypeID, &cartype.CarTypeName, &cartype.CarTypeDesctiption, &cartype.Image64)
+	if err != nil {
+		return model.FrontendCarType{}, err, err.Error()
+	}
+	return cartype, nil, "success"
+}
+
+func FrontendGetCars(c *fiber.Ctx) ([]model.FrontendCar, error, string) {
+	id, err := strconv.Atoi(c.Params("cartypeid"))
+	var cars []model.FrontendCar
+	query := "SELECT c.CarID , c.CarName , c.CarDesctiption , c.CarTypeID   FROM Htt.CarType ct LEFT JOIN Car c ON ct.CarTypeID = c.CarTypeID WHERE ct.CarTypeID = ? AND c.CarInactive = 0"
+	rows, err := db.Query(query, id)
+	if err != nil {
+		return []model.FrontendCar{}, err, err.Error()
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var car model.FrontendCar
+		// var imagePath sql.NullString
+		err = rows.Scan(&car.CarID, &car.CarName, &car.CarDesctiption, &car.CarTypeID)
+		if err != nil {
+			return []model.FrontendCar{}, err, err.Error()
+		}
+		img, err := global.GetImages(int64(car.CarID), constant.CarImage)
+		if err != nil {
+			return []model.FrontendCar{}, err, err.Error()
+		}
+		car.Image64 = img.Image64
+		cars = append(cars, car)
+	}
+	return cars, nil, "success"
+}
+
+func FrontendGetJobApplications() ([]model.FrontendJobApplications, error, string) {
+	var jobApplications []model.FrontendJobApplications
+	query := "SELECT JobApplicationsID,JobApplicationsName,JobApplicationsPosition FROM JobApplications WHERE JobApplicationsInactive = 0;"
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err, err.Error()
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var jobApplication model.FrontendJobApplications
+		err = rows.Scan(&jobApplication.JobApplicationsID, &jobApplication.JobApplicationsName, &jobApplication.JobApplicationsPosition)
+		if err != nil {
+			return nil, err, err.Error()
+		}
+		jobApplications = append(jobApplications, jobApplication)
+	}
+	return jobApplications, nil, "success"
+}
+
+func FrontendGetJobApplication(c *fiber.Ctx) (model.FrontendJobApplications, error, string) {
+	id, err := strconv.Atoi(c.Params("jobapplicationsid"))
+	if err != nil {
+		return model.FrontendJobApplications{}, err, err.Error()
+	}
+	var job model.FrontendJobApplications
+	err = db.QueryRow("SELECT JobApplicationsID,JobApplicationsName,JobApplicationsPosition,JobApplicationsDescription FROM JobApplications WHERE JobApplicationsInactive = 0 AND JobApplicationsID = ?;", id).Scan(&job.JobApplicationsID, &job.JobApplicationsName, &job.JobApplicationsPosition, &job.JobApplicationsDescription)
+	if err != nil {
+		return model.FrontendJobApplications{}, err, err.Error()
+	}
+	return job, nil, "success"
 }

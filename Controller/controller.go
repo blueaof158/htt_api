@@ -99,6 +99,21 @@ func DeleteCarType(c *fiber.Ctx) error {
 // ## CarType
 
 // ## Award
+func FrontendGetAwards(c *fiber.Ctx) error {
+	data, err, msg := services.FrontendGetAwards()
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
+
 func GetAwards(c *fiber.Ctx) error {
 	data, err, msg := services.GetAwards()
 	if err != nil {
@@ -411,6 +426,21 @@ func DeleteExecutive(c *fiber.Ctx) error {
 // ## Executives
 
 // ## BannerTop
+func FrontendGetBannerTops(c *fiber.Ctx) error {
+	data, err, msg := services.FrontendGetBannerTops()
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
+
 func GetBannerTops(c *fiber.Ctx) error {
 	data, err, msg := services.GetBannerTops()
 	if err != nil {
@@ -566,6 +596,84 @@ func DeleteJobApplication(c *fiber.Ctx) error {
 
 // ## JobApplication
 
+// ## User
+func GetUsers(c *fiber.Ctx) error {
+	data, err, msg := services.GetUsers()
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
+
+func GetUser(c *fiber.Ctx) error {
+	data, err, msg := services.GetUser(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
+
+func AddUser(c *fiber.Ctx) error {
+	data, err, msg := services.AddUser(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
+
+func UpdateUser(c *fiber.Ctx) error {
+	data, err, msg := services.UpdateUser(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
+
+func DeleteUser(c *fiber.Ctx) error {
+	data, err, msg := services.DeleteUser(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
+
+// ## User
+
 func AddImage(c *fiber.Ctx) error {
 	err, msg := services.AddImage(c)
 	if err != nil {
@@ -593,4 +701,154 @@ func GetImage(c *fiber.Ctx) error {
 		"status":  fiber.StatusOK,
 		"message": msg,
 	})
+}
+
+func UpdateConfig(c *fiber.Ctx) error {
+	err, msg := services.UpdateConfig(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
+
+func GetConfig(c *fiber.Ctx) error {
+	data, err, msg := services.GetConfig(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
+
+func FrontendGetConfig(c *fiber.Ctx) error {
+	data, err, msg := services.FrontendGetConfig(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
+func FrontendGetCarTypes(c *fiber.Ctx) error {
+	data, err, msg := services.FrontendGetCarTypes(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
+func FrontendGetCarType(c *fiber.Ctx) error {
+	data, err, msg := services.FrontendGetCarType(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+}
+func FrontendGetContents(c *fiber.Ctx) error {
+	data, err, msg := services.FrontendGetContents(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+
+}
+func FrontendGetContent(c *fiber.Ctx) error {
+	data, err, msg := services.FrontendGetContent(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+
+}
+func FrontendGetCars(c *fiber.Ctx) error {
+	data, err, msg := services.FrontendGetCars(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+
+}
+
+func FrontendGetJobApplications(c *fiber.Ctx) error {
+	data, err, msg := services.FrontendGetJobApplications()
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+
+}
+
+func FrontendGetJobApplication(c *fiber.Ctx) error {
+	data, err, msg := services.FrontendGetJobApplication(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var db, _ = database.ConnectDB()
@@ -56,4 +57,35 @@ func GetImages(id int64, imageType string) (model.ImageJson, error) {
 	imageJson.ImageType = imageType
 
 	return imageJson, nil
+}
+
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
+func AddConfig(configname string, value string) string {
+	stmt, err := db.Prepare("INSERT INTO OtherConfigs (ConfigName,Value,CreateBy,CreateDate,UpdateBy,UpdateDate) VALUES (?,?,User(), NOW(), User(), NOW())")
+	if err != nil {
+		return err.Error()
+	}
+	_, err = stmt.Exec(
+		configname,
+		value)
+	return ""
+}
+
+func DeleteConfig() (error, string) {
+	stmt, err := db.Prepare("DELETE FROM OtherConfigs;")
+	if err != nil {
+		return err, err.Error()
+	}
+	_, err = stmt.Exec()
+	return nil, ""
+
 }
