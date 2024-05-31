@@ -852,3 +852,19 @@ func FrontendGetJobApplication(c *fiber.Ctx) error {
 	})
 
 }
+
+func CheckAuth(c *fiber.Ctx) error {
+	data, err, msg := services.CheckAuth(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  fiber.StatusBadRequest,
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"data":    data,
+		"status":  fiber.StatusOK,
+		"message": msg,
+	})
+
+}

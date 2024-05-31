@@ -1,11 +1,8 @@
 package auth
 
 import (
-	model "HTTApi/Model"
-
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 )
 
 var Token = ""
@@ -27,26 +24,26 @@ func CheckMiddleware(c *fiber.Ctx) error {
 	return c.Next()
 }
 
-var userMember = model.Login{
-	Email:    "test@mail.com",
-	Password: "12345@",
-}
+// var userMember = model.Login{
+// 	Email:    "test@mail.com",
+// 	Password: "12345@",
+// }
 
-func Login(c *fiber.Ctx) error {
+// func Login(c *fiber.Ctx) error {
 
-	user := new(model.Login)
-	if err := c.BodyParser(user); err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
-	}
-	g := uuid.New()
+// 	user := new(model.Login)
+// 	if err := c.BodyParser(user); err != nil {
+// 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+// 	}
+// 	g := uuid.New()
 
-	if user.Email != userMember.Email && user.Password != userMember.Email {
-		return fiber.ErrUnauthorized
-	}
-	Token = g.String()
-	return c.JSON(fiber.Map{
-		"message": "Login Successful",
-		"token":   g,
-	})
+// 	if user.Email != userMember.Email && user.Password != userMember.Email {
+// 		return fiber.ErrUnauthorized
+// 	}
+// 	Token = g.String()
+// 	return c.JSON(fiber.Map{
+// 		"message": "Login Successful",
+// 		"token":   g,
+// 	})
 
-}
+// }

@@ -925,10 +925,10 @@ func AddUser(c *fiber.Ctx) (model.User, error, string) {
 	if err != nil {
 		return model.User{}, err, err.Error()
 	}
-	password, _ := global.HashPassword(user.Password)
+	// password, _ := global.HashPassword(user.Password)
 	result, err := stmt.Exec(
 		user.User,
-		password,
+		user.Password,
 		user.Inactive,
 	)
 	if err != nil {
@@ -954,13 +954,13 @@ func UpdateUser(c *fiber.Ctx) (model.User, error, string) {
 	if data == (model.User{}) {
 		return model.User{}, err, err.Error()
 	}
-	password, _ := global.HashPassword(content.Password)
+	// password, _ := global.HashPassword(content.Password)
 	stmt, err := db.Prepare("UPDATE User SET Password=?, Inactive=? WHERE UserID=?")
 	if err != nil {
 		return model.User{}, err, err.Error()
 	}
 	_, err = stmt.Exec(
-		password,
+		content.Password,
 		content.Inactive,
 		userid,
 	)
@@ -1237,4 +1237,25 @@ func FrontendGetJobApplication(c *fiber.Ctx) (model.FrontendJobApplications, err
 		return model.FrontendJobApplications{}, err, err.Error()
 	}
 	return job, nil, "success"
+}
+
+func CheckAuth(c *fiber.Ctx) (model.Login, error, string) {
+	login := new(model.Login)
+	if err = c.BodyParser(login); err != nil {
+		return model.Login{}, err, err.Error()
+	}
+	stmt, err := db.Prepare("SELECT User , Password FROM User WHERE User = ? AND Password = ? AND Inactive = 0")
+	if err != nil {
+		return model.Login{}, err, err.Error()
+	}
+
+	var r model.Login
+	err = stmt.QueryRow(login.User, login.Password).Scan(&r.User, &r.Password)
+
+	if err != nil {
+		return model.Login{}, err, err.Error()
+	}
+
+	return r, nil, "success"
+
 }

@@ -206,7 +206,7 @@ type FrontendCar struct {
 }
 
 type Login struct {
-	Email    string `json:"email"`
+	User     string `json:"user"`
 	Password string `json:"password"`
 }
 

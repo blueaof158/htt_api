@@ -19,7 +19,7 @@ func Route(app *fiber.App) {
 		AllowMethods: "GET,POST,HEAD,PUT,DELETE,PATCH",
 		AllowHeaders: "Origin, Content-Type, Accept",
 	}))
-	app.Post("/api/login", auth.Login)
+	// app.Post("/api/login", auth.Login)
 	app.Post("/api/gettoken", getToken)
 
 	app.Get("api/frontend/bannertops", controller.FrontendGetBannerTops)
@@ -91,6 +91,8 @@ func Route(app *fiber.App) {
 	app.Get("/api/frontend/getcars/:cartypeid", controller.FrontendGetCars)
 	app.Get("/api/frontend/getjobshtt", controller.FrontendGetJobApplications)
 	app.Get("/api/frontend/getjobhtt/:jobapplicationsid", controller.FrontendGetJobApplication)
+
+	app.Post("/api/checkauth", controller.CheckAuth)
 
 	app.Post("/api/addimages", controller.AddImage)
 	app.Get("/api/getimages/:imagetype/:id", controller.GetImage)
