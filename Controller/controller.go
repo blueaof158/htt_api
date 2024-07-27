@@ -22,6 +22,7 @@ func GetCarTypes(c *fiber.Ctx) error {
 		"message": msg,
 	})
 }
+
 func GetCarTypesLst(c *fiber.Ctx) error {
 	data, err, msg := services.GetCarTypesLst()
 	if err != nil {

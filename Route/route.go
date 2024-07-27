@@ -1,11 +1,7 @@
 package route
 
 import (
-	auth "HTTApi/Auth"
 	controller "HTTApi/Controller"
-	"fmt"
-	"os"
-	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gofiber/fiber/v2"
@@ -20,13 +16,13 @@ func Route(app *fiber.App) {
 		AllowHeaders: "Origin, Content-Type, Accept",
 	}))
 	// app.Post("/api/login", auth.Login)
-	app.Post("/api/gettoken", getToken)
+	// app.Post("/api/gettoken", getToken)
 
 	app.Get("api/frontend/bannertops", controller.FrontendGetBannerTops)
 
 	// app.Use(auth.CheckMiddleware)
 
-	app.Get("/api/getenv/:name", getEnv)
+	// app.Get("/api/getenv/:name", getEnv)
 
 	app.Get("/api/getcartypes", controller.GetCarTypes)
 	app.Get("/api/getcartypeslst", controller.GetCarTypesLst)
@@ -99,23 +95,4 @@ func Route(app *fiber.App) {
 
 	app.Listen(":8080")
 
-}
-func getEnv(c *fiber.Ctx) error {
-	name := c.Params("name")
-	addressdb := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", os.Getenv("db_user"), os.Getenv("db_pwd"), os.Getenv("database_ip"), os.Getenv("database_port"), os.Getenv("database_name"))
-	addressdba := os.Getenv("db_user") + ":" + os.Getenv("db_pwd") + "@tcp(" + os.Getenv("database_ip") + ":" + os.Getenv("database_port") + "/" + os.Getenv("database_name")
-
-	return c.JSON(fiber.Map{
-		"env":  os.Getenv(name),
-		"name": name,
-		"db":   addressdb,
-		"db2":  addressdba,
-		"aa":   time.Now().Format("2006-01-02 15:04:05"),
-	})
-}
-
-func getToken(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{
-		"token": auth.Token,
-	})
 }

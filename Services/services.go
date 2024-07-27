@@ -925,10 +925,10 @@ func AddUser(c *fiber.Ctx) (model.User, error, string) {
 	if err != nil {
 		return model.User{}, err, err.Error()
 	}
-	// password, _ := global.HashPassword(user.Password)
+	password, _ := global.HashPassword(user.Password)
 	result, err := stmt.Exec(
 		user.User,
-		user.Password,
+		password,
 		user.Inactive,
 	)
 	if err != nil {
@@ -954,13 +954,13 @@ func UpdateUser(c *fiber.Ctx) (model.User, error, string) {
 	if data == (model.User{}) {
 		return model.User{}, err, err.Error()
 	}
-	// password, _ := global.HashPassword(content.Password)
+	password, _ := global.HashPassword(content.Password)
 	stmt, err := db.Prepare("UPDATE User SET Password=?, Inactive=? WHERE UserID=?")
 	if err != nil {
 		return model.User{}, err, err.Error()
 	}
 	_, err = stmt.Exec(
-		content.Password,
+		password,
 		content.Inactive,
 		userid,
 	)
@@ -1244,18 +1244,18 @@ func CheckAuth(c *fiber.Ctx) (model.Login, error, string) {
 	if err = c.BodyParser(login); err != nil {
 		return model.Login{}, err, err.Error()
 	}
-	stmt, err := db.Prepare("SELECT User , Password FROM User WHERE User = ? AND Password = ? AND Inactive = 0")
+	stmt, err := db.Prepare("SELECT User , Password FROM User WHERE User = ? AND Inactive = 0")
 	if err != nil {
 		return model.Login{}, err, err.Error()
 	}
 
 	var r model.Login
-	err = stmt.QueryRow(login.User, login.Password).Scan(&r.User, &r.Password)
+	err = stmt.QueryRow(login.User).Scan(&r.User, &r.Password)
 
-	if err != nil {
-		return model.Login{}, err, err.Error()
+	match := global.CheckPasswordHash(login.Password, r.Password)
+
+	if match {
+		return r, nil, "success"
 	}
-
-	return r, nil, "success"
-
+	return model.Login{}, err, err.Error()
 }
