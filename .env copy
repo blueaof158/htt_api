@@ -1,0 +1,5 @@
+DB_USER=Httusr_db2024
+DB_PASSWORD=Httusr_db2024DB@P@ssw0rd
+DB_HOST=host.docker.internal
+DB_PORT=3333
+DB_NAME=Htt
