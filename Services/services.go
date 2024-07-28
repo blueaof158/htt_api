@@ -648,7 +648,7 @@ func DeleteExecutive(c *fiber.Ctx) (model.Executives, error, string) {
 // ## BannerTop
 func FrontendGetBannerTops() ([]model.FrontendBannerTop, error, string) {
 	var bannertops []model.FrontendBannerTop
-	query := "SELECT BT.BannerTopImageLink,Img.ImagePath FROM Htt.BannerTop BT LEFT JOIN Htt.Images Img ON BT.BannerTopID = Img.BannerTopID WHERE BT.BannerTopInactive = 0;"
+	query := "SELECT BT.BannerTopImageLink,Img.ImagePath FROM BannerTop BT LEFT JOIN Images Img ON BT.BannerTopID = Img.BannerTopID WHERE BT.BannerTopInactive = 0;"
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err, err.Error()
@@ -667,7 +667,7 @@ func FrontendGetBannerTops() ([]model.FrontendBannerTop, error, string) {
 
 func GetBannerTops() ([]model.BannerTop, error, string) {
 	var bannertops []model.BannerTop
-	query := "SELECT BT.BannerTopID,BT.BannerTopImageLink,BT.BannerTopInactive,Img.ImagePath,BT.CreateBy,BT.CreateDate,BT.UpdateBy,BT.UpdateDate FROM Htt.BannerTop BT LEFT JOIN Htt.Images Img ON BT.BannerTopID = Img.BannerTopID ORDER BY BT.BannerTopID ASC;"
+	query := "SELECT BT.BannerTopID,BT.BannerTopImageLink,BT.BannerTopInactive,Img.ImagePath,BT.CreateBy,BT.CreateDate,BT.UpdateBy,BT.UpdateDate FROM BannerTop BT LEFT JOIN Images Img ON BT.BannerTopID = Img.BannerTopID ORDER BY BT.BannerTopID ASC;"
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err, err.Error()
@@ -688,7 +688,7 @@ func GetBannerTop(c *fiber.Ctx) (model.BannerTop, error, string) {
 	id, err := strconv.Atoi(c.Params("bannertopid"))
 	var bannertop model.BannerTop
 
-	err = db.QueryRow("SELECT BT.BannerTopID,BT.BannerTopImageLink,BT.BannerTopInactive,Img.ImagePath,BT.CreateBy,BT.CreateDate,BT.UpdateBy,BT.UpdateDate FROM Htt.BannerTop BT LEFT JOIN Htt.Images Img ON BT.BannerTopID = Img.BannerTopID WHERE BT.BannerTopID = ?;", id).Scan(&bannertop.BannerTopID, &bannertop.BannerTopImageLink, &bannertop.BannerTopInactive, &bannertop.ImagePath, &bannertop.CreateBy, &bannertop.CreateDate, &bannertop.UpdateBy, &bannertop.UpdateDate)
+	err = db.QueryRow("SELECT BT.BannerTopID,BT.BannerTopImageLink,BT.BannerTopInactive,Img.ImagePath,BT.CreateBy,BT.CreateDate,BT.UpdateBy,BT.UpdateDate FROM BannerTop BT LEFT JOIN Images Img ON BT.BannerTopID = Img.BannerTopID WHERE BT.BannerTopID = ?;", id).Scan(&bannertop.BannerTopID, &bannertop.BannerTopImageLink, &bannertop.BannerTopInactive, &bannertop.ImagePath, &bannertop.CreateBy, &bannertop.CreateDate, &bannertop.UpdateBy, &bannertop.UpdateDate)
 	// err = db.QueryRow("SELECT BannerTopID,BannerTopImagegPath,BannerTopImageLink,BannerTopInactive,CreateBy,CreateDate,UpdateBy,UpdateDate FROM BannerTop WHERE ExecutivesID = ?;", id).Scan(&bannertop.BannerTopID, &bannertop.BannerTopImagegPath, &bannertop.BannerTopImageLink, &bannertop.BannerTopInactive, &bannertop.CreateBy, &bannertop.CreateDate, &bannertop.UpdateBy, &bannertop.UpdateDate)
 	if err != nil {
 		return model.BannerTop{}, err, err.Error()
@@ -1184,7 +1184,7 @@ func FrontendGetCarType(c *fiber.Ctx) (model.FrontendCarType, error, string) {
 func FrontendGetCars(c *fiber.Ctx) ([]model.FrontendCar, error, string) {
 	id, err := strconv.Atoi(c.Params("cartypeid"))
 	var cars []model.FrontendCar
-	query := "SELECT c.CarID , c.CarName , c.CarDesctiption , c.CarTypeID   FROM Htt.CarType ct LEFT JOIN Car c ON ct.CarTypeID = c.CarTypeID WHERE ct.CarTypeID = ? AND c.CarInactive = 0"
+	query := "SELECT c.CarID , c.CarName , c.CarDesctiption , c.CarTypeID   FROM CarType ct LEFT JOIN Car c ON ct.CarTypeID = c.CarTypeID WHERE ct.CarTypeID = ? AND c.CarInactive = 0"
 	rows, err := db.Query(query, id)
 	if err != nil {
 		return []model.FrontendCar{}, err, err.Error()
